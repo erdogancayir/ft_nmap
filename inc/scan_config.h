@@ -20,7 +20,9 @@ typedef struct {
     int scan_count;
     int speedup;
     bool show_help;
+    char *my_ip; // ✅ bunu mutlaka eklemiş olmalısın
 } t_scan_config;
+
 
 void parse_args(int argc, char **argv, t_scan_config *config);
 

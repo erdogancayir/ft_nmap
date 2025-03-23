@@ -2,13 +2,13 @@
 #include "tcp.h"
 #include "udp.h"
 #include <netinet/tcp.h> // For TH_SYN, TH_FIN, TH_ACK, etc.
-
+#include "ft_nmap.h"
 
 void *worker_thread(void *arg) {
     t_job_queue *q = (t_job_queue *)arg;
     t_scan_job job;
 
-    char *my_ip = NULL;
+    char *my_ip = q->my_ip;
     if (!my_ip || strlen(my_ip) == 0) {
         fprintf(stderr, "Hata: kaynak IP tanımlı değil!\n");
         pthread_exit(NULL);

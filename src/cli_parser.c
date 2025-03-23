@@ -68,7 +68,7 @@ int parse_scan_types(const char *input, scan_type *scans) {
 void parse_args(int argc, char **argv, t_scan_config *config) {
     memset(config, 0, sizeof(*config));
 
-    config->ip = find_source_ip();
+    config->my_ip = find_source_ip();
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0)
@@ -83,6 +83,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
             config->scan_count = parse_scan_types(argv[++i], config->scan_types);
         else if (strcmp(argv[i], "--speedup") == 0 && i+1 < argc)
             config->speedup = atoi(argv[++i]);
+        else if (strcmp(argv[i], "--my-ip") == 0 && i+1 < argc)
+            config->my_ip = argv[++i];
         else {
             fprintf(stderr, "Bilinmeyen veya eksik argüman: %s\n", argv[i]);
             exit(1);

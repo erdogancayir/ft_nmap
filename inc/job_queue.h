@@ -30,7 +30,7 @@ typedef struct {
 } t_scan_job;
 
 typedef struct {
-    char *source_ip;
+    char *my_ip;
     t_scan_job jobs[MAX_QUEUE];
     int head;
     int tail;
@@ -47,6 +47,5 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job);
 void start_thread_pool(t_job_queue *q, int count);
 void *worker_thread(void *arg);
 
-char *find_source_ip();
 
 #endif

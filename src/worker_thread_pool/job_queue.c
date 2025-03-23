@@ -5,7 +5,7 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     q->head = q->tail = 0;
     pthread_mutex_init(&q->mutex, NULL);
     pthread_cond_init(&q->cond, NULL);
-    q->source_ip = my_ip;
+    q->my_ip = my_ip;
 
      // Job enqueue
     for (int i = 0; i < config.port_count; i++) {
