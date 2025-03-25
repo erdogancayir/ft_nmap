@@ -10,7 +10,7 @@ SRCS = $(shell find $(SRC_DIR) -name '*.c')
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
 
-TEST_NAME = test_parse_args
+TEST_NAME = test
 TEST_SRC = $(TEST_DIR)/test_parse_args.c
 TEST_OBJ = $(TEST_SRC:%.c=$(OBJ_DIR)/%.o)
 
