@@ -89,6 +89,26 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         }
     }
 
+    if (config->scan_count == 0) {
+        config->scan_types[0] = SCAN_SYN;
+        config->scan_types[1] = SCAN_NULL;
+        config->scan_types[2] = SCAN_FIN;
+        config->scan_types[3] = SCAN_XMAS;
+        config->scan_types[4] = SCAN_ACK;
+        config->scan_types[5] = SCAN_UDP;
+        config->scan_count = 6;
+    }
+
+    if (config->port_count == 0) {
+        for (int i = 1; i <= 1024; i++)
+            config->ports[config->port_count++] = i;
+    }
+    
+    if (!config->ip && !config->ip_file) {
+        fprintf(stderr, "Hata: --ip veya --file belirtilmeli!\n");
+        exit(EXIT_FAILURE);
+    }
+
     if (config->show_help)
         print_help();
 }

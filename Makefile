@@ -4,24 +4,41 @@ CFLAGS = -Wall -Wextra -Werror -Iinc -MMD -MP
 
 SRC_DIR = src
 OBJ_DIR = obj
+TEST_DIR = tests
 
 SRCS = $(shell find $(SRC_DIR) -name '*.c')
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
+
+TEST_NAME = test_parse_args
+TEST_SRC = $(TEST_DIR)/test_parse_args.c
+TEST_OBJ = $(TEST_SRC:%.c=$(OBJ_DIR)/%.o)
+
+MAIN_OBJ := $(OBJ_DIR)/src/main.o
+OBJS_NO_MAIN := $(filter-out $(MAIN_OBJ), $(OBJS))
 
 # Default target
 all: $(NAME)
 
 # Create the binary
 $(NAME): $(OBJS)
-	@echo "🔗 Linking..."
+	@echo "🔗 Linking $(NAME)..."
 	$(CC) $(CFLAGS) -o $@ $^
 
-# Compile source files to object files with header tracking
+# Compile source files to object files
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "📦 Compiling $<..."
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Build and run the test binary
+test: $(TEST_NAME)
+	@echo "🚀 Running tests..."
+	./$(TEST_NAME)
+
+$(TEST_NAME): $(TEST_OBJ) $(OBJS_NO_MAIN)
+	@echo "🧪 Linking test binary..."
+	$(CC) $(CFLAGS) -o $@ $^
 
 # Include dependency files
 -include $(DEPS)
@@ -31,12 +48,10 @@ clean:
 	@echo "🧹 Cleaning object files..."
 	@rm -rf $(OBJ_DIR)
 
-# Clean binary
+# Clean binaries
 fclean: clean
-	@echo "🗑️ Removing binary..."
-	@rm -f $(NAME)
+	@echo "🗑️ Removing binaries..."
+	@rm -f $(NAME) $(TEST_NAME)
 
 # Rebuild everything
 re: fclean all
-
-.PHONY: all clean fclean re
