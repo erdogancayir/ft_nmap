@@ -1,7 +1,10 @@
 obj/src/main.o: src/main.c inc/scan_config.h inc/scan_type.h \
- inc/ft_nmap.h inc/job_queue.h inc/scan_config.h
+  inc/ft_nmap.h inc/job_queue.h
+
 inc/scan_config.h:
+
 inc/scan_type.h:
+
 inc/ft_nmap.h:
+
 inc/job_queue.h:
-inc/scan_config.h:

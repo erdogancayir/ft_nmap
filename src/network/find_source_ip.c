@@ -1,7 +1,5 @@
 
 #include <net/if.h>
-#include <linux/if_packet.h>
-#include <linux/if_arp.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>

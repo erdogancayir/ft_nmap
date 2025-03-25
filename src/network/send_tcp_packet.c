@@ -1,4 +1,3 @@
-#include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <string.h>
@@ -6,26 +5,25 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <stdio.h>
+#include <stdint.h>
 
+// TCP checksum hesaplaması (pseudo-header dahil)
 unsigned short checksum_tcp(unsigned short *ptr, int nbytes) {
     long sum = 0;
     unsigned short oddbyte;
     unsigned short result;
 
-    // 16-bit kelimeleri topla
     while (nbytes > 1) {
         sum += *ptr++;
         nbytes -= 2;
     }
 
-    // Eğer kalan tek bir byte varsa (tek sayıda byte durumunda)
     if (nbytes == 1) {
         oddbyte = 0;
         *((unsigned char *)&oddbyte) = *(unsigned char *)ptr;
         sum += oddbyte;
     }
 
-    // 32-bit toplamı 16-bit’e indir
     sum = (sum >> 16) + (sum & 0xffff);
     sum += (sum >> 16);
 
@@ -36,21 +34,7 @@ unsigned short checksum_tcp(unsigned short *ptr, int nbytes) {
 void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int dst_port, unsigned char flags) {
     char packet[4096] = {0};
 
-    struct ip *ip_hdr = (struct ip *)packet;
-    struct tcphdr *tcp_hdr = (struct tcphdr *)(packet + sizeof(struct ip));
-
-    // IP header (POSIX-style)
-    ip_hdr->ip_hl = 5;  // 5 * 4 = 20 byte
-    ip_hdr->ip_v = 4;   // IPv4
-    ip_hdr->ip_tos = 0;
-    ip_hdr->ip_len = htons(sizeof(struct ip) + sizeof(struct tcphdr));
-    ip_hdr->ip_id = htons(rand() % 65535);
-    ip_hdr->ip_off = 0;
-    ip_hdr->ip_ttl = 64;
-    ip_hdr->ip_p = IPPROTO_TCP;
-    ip_hdr->ip_src.s_addr = inet_addr(src_ip);
-    ip_hdr->ip_dst.s_addr = inet_addr(dst_ip);
-    ip_hdr->ip_sum = checksum_tcp((unsigned short *)ip_hdr, sizeof(struct ip));
+    struct tcphdr *tcp_hdr = (struct tcphdr *)packet;
 
     // TCP header
     tcp_hdr->th_sport = htons(src_port);
@@ -61,6 +45,7 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     tcp_hdr->th_flags = flags;
     tcp_hdr->th_win = htons(65535);
     tcp_hdr->th_sum = 0;
+    tcp_hdr->th_urp = 0;
 
     // TCP pseudo-header checksum için
     struct pseudo_header {
@@ -71,8 +56,8 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
         uint16_t len;
     } psh;
 
-    psh.src = ip_hdr->ip_src.s_addr;
-    psh.dst = ip_hdr->ip_dst.s_addr;
+    psh.src = inet_addr(src_ip);
+    psh.dst = inet_addr(dst_ip);
     psh.zero = 0;
     psh.protocol = IPPROTO_TCP;
     psh.len = htons(sizeof(struct tcphdr));
@@ -80,24 +65,24 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     char pseudo[1024];
     memcpy(pseudo, &psh, sizeof(psh));
     memcpy(pseudo + sizeof(psh), tcp_hdr, sizeof(struct tcphdr));
+
     tcp_hdr->th_sum = checksum_tcp((unsigned short *)pseudo, sizeof(psh) + sizeof(struct tcphdr));
 
-    // Raw socket oluştur
-    int sock = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
+    // Raw TCP socket
+    int sock = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
     if (sock < 0) {
         perror("socket");
         return;
     }
 
-    // IP başlığını biz yazdık → Kernel'e söyle
-    int one = 1;
-    setsockopt(sock, IPPROTO_IP, IP_HDRINCL, &one, sizeof(one));
+    // NOT using IP_HDRINCL – kernel will add IP header
 
     struct sockaddr_in dst;
     dst.sin_family = AF_INET;
-    dst.sin_addr.s_addr = ip_hdr->ip_dst.s_addr;
+    dst.sin_port = htons(dst_port); // optional in raw socket
+    inet_pton(AF_INET, dst_ip, &dst.sin_addr);
 
-    if (sendto(sock, packet, sizeof(struct ip) + sizeof(struct tcphdr), 0,
+    if (sendto(sock, tcp_hdr, sizeof(struct tcphdr), 0,
                (struct sockaddr *)&dst, sizeof(dst)) < 0) {
         perror("sendto");
     }

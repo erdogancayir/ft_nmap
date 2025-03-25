@@ -10,7 +10,7 @@ void *worker_thread(void *arg) {
 
     char *my_ip = q->my_ip;
     if (!my_ip || strlen(my_ip) == 0) {
-        fprintf(stderr, "Hata: kaynak IP tanımlı değil!\n");
+        fprintf(stderr, "Error: source IP is not defined!\n");
         pthread_exit(NULL);
     }
 
@@ -36,7 +36,7 @@ void *worker_thread(void *arg) {
                 break;
         }
 
-        printf("📤 Gönderildi: %s:%d (type: %d)\n", job.target_ip, job.target_port, job.type);
+        printf("📤 Sent: %s:%d (type: %d)\n", job.target_ip, job.target_port, job.type);
         usleep(1000);
     }
 
