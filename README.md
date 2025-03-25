@@ -9,8 +9,6 @@ https://medium.com/@erdogancayir/pcap-nedir-a%C4%9F-paketlerini-yakalaman%C4%B1n
 
 ## 📋 Table of Contents
 
-## 📋 Table of Contents
-
 - [About](#about)
 - [Features](#features)
 - [Job Queue System](#job-queue-system)
