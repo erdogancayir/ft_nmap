@@ -22,7 +22,7 @@ https://medium.com/@erdogancayir/pcap-nedir-a%C4%9F-paketlerini-yakalaman%C4%B1n
 
 ---
 
-## 📖 About
+## About
 
 This project is a simplified network port scanner built using:
 
@@ -35,7 +35,7 @@ This project is a simplified network port scanner built using:
 
 ---
 
-## 🚀 Features
+## Features
 
 - ✅ Command-line argument parser
 - ✅ Multi-threaded port scanning (`--speedup`)
@@ -47,7 +47,7 @@ This project is a simplified network port scanner built using:
 
 ---
 
-## 🧵 Job Queue System
+## Job Queue System
 
 ### [Overview](#overview)
 
