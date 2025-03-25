@@ -23,13 +23,13 @@ all: $(NAME)
 # Create the binary
 $(NAME): $(OBJS)
 	@echo "🔗 Linking $(NAME)..."
-	$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^
 
 # Compile source files to object files
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "📦 Compiling $<..."
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@ >/dev/null 2>&1
 
 # Build and run the test binary
 test: $(TEST_NAME)
@@ -38,7 +38,7 @@ test: $(TEST_NAME)
 
 $(TEST_NAME): $(TEST_OBJ) $(OBJS_NO_MAIN)
 	@echo "🧪 Linking test binary..."
-	$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^
 
 # Include dependency files
 -include $(DEPS)
