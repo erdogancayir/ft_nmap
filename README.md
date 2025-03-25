@@ -9,18 +9,16 @@ https://medium.com/@erdogancayir/pcap-nedir-a%C4%9F-paketlerini-yakalaman%C4%B1n
 
 ## 📋 Table of Contents
 
+## 📋 Table of Contents
+
 - [About](#about)
 - [Features](#features)
-- [Job Queue System](#-job-queue-system)
+- [Job Queue System](#job-queue-system)
   - [Overview](#overview)
   - [Why a Job Queue?](#why-a-job-queue)
   - [How It Works](#how-it-works)
-  - [Thread Safety](#thread-safety)
-  - [Benefits](#benefits)
-  - [Example Snippets](#example-snippets)
-- [Build & Run](#build--run)
+- [Build & Run](#build-run)
 - [Dependencies](#dependencies)
-- [License](#license)
 
 ---
 
@@ -51,13 +49,13 @@ This project is a simplified network port scanner built using:
 
 ## 🧵 Job Queue System
 
-### 🔗 [Overview](#overview)
+### [Overview](#overview)
 
 The **job queue** (`t_job_queue`) is a central mechanism in `ft_nmap` that manages the distribution of scanning tasks across multiple threads. It is designed to be **thread-safe and efficient**, ensuring maximum concurrency while maintaining correctness.
 
 ---
 
-### 🔗 [Why a Job Queue?](#why-a-job-queue)
+### [Why a Job Queue?](#why-a-job-queue)
 
 In a multi-threaded port scanner, it's essential to manage tasks (port scans) efficiently across worker threads. Without a job queue, threads might:
 
@@ -74,15 +72,9 @@ The job queue enables **producer-consumer synchronization** and ensures that:
 
 ---
 
-### 🔗 [How It Works](#how-it-works)
+### [How It Works](#how-it-works)
 
-### 🧪 Scan Job Generation
-
-A **scan job** is created for each combination of **port** and **scan type**. This allows fine-grained control over how each port is probed using different techniques (e.g., SYN, UDP, etc.).
-
----
-
-#### 📋 Example
+#### Example
 
 If the user provides:
 - Ports: `22`, `80`
