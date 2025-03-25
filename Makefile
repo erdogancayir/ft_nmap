@@ -29,7 +29,7 @@ $(NAME): $(OBJS)
 $(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@echo "📦 Compiling $<..."
-	@$(CC) $(CFLAGS) -c $< -o $@ >/dev/null 2>&1
+	@$(CC) $(CFLAGS) -c $< -o $@ || (echo "❌ Compile error in $<"; exit 1)
 
 # Build and run the test binary
 test: $(TEST_NAME)
