@@ -60,9 +60,3 @@ void test_case_defaults() {
 
     printf("✅ test_case_defaults passed\n");
 }
-
-int main() {
-    test_case_basic();
-    test_case_defaults();
-    return 0;
-}
