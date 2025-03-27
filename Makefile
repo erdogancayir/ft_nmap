@@ -1,6 +1,7 @@
 NAME = ft_nmap
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Iinc -MMD -MP
+LDLIBS = -lpcap
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -25,7 +26,7 @@ all: $(NAME)
 # Uygulama binary'si
 $(NAME): $(OBJS)
 	@echo "🔗 Linking $(NAME)..."
-	@$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 # Nesne dosyaları oluştur
 $(OBJ_DIR)/%.o: %.c

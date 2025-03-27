@@ -2,6 +2,7 @@
 #include "ft_nmap.h"
 #include "job_queue.h"
 #include "scan_result.h"
+#include <pthread.h>
 
 int main(int argc, char **argv) {
     t_scan_config config;
@@ -19,14 +20,13 @@ int main(int argc, char **argv) {
     pthread_mutex_init(&shared_results.mutex, NULL);
 
 
-    //pthread_t pcap_thread;
-    //pthread_create(&pcap_thread, NULL, pcap_listener_thread, &shared_results);
+    pthread_t sniffer_tid;
+    pthread_create(&sniffer_tid, NULL, sniffer_thread, (void *)&shared_results);
 
     start_thread_pool(&queue, config.speedup);
 
-    //pthread_join(pcap_thread, NULL);
-
-    //pthread_mutex_destroy(&shared_results.mutex);
+    pthread_cancel(sniffer_tid);  // veya pcap_breakloop ile kibarca
+    pthread_join(sniffer_tid, NULL);
 
     return 0;
 }
