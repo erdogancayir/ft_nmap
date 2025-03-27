@@ -41,7 +41,7 @@ test: $(TEST_NAME)
 
 $(TEST_NAME): $(TEST_OBJS) $(OBJS_NO_MAIN)
 	@echo "🧪 Linking test binary..."
-	@$(CC) $(CFLAGS) -o $@ $^
+	@$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS)
 
 -include $(DEPS)
 

@@ -3,6 +3,7 @@
         "inet.h": "c",
         "scan_result.h": "c",
         "test.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "pthread.h": "c"
     }
 }
