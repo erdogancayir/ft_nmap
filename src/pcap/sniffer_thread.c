@@ -13,7 +13,7 @@ void *sniffer_thread(void *arg) {
     pcap_t *handle;
 
     // 1. Interface seç
-    const char *dev = "eth0"; // ileride otomatikleştirilebilir
+    const char *dev = "en0"; // ileride otomatikleştirilebilir
 
     // 2. Pcap canlı dinleyici başlat
     handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);

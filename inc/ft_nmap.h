@@ -8,12 +8,14 @@
 #include <pcap.h>
 #include "scan_result.h"
 
+
 char *find_source_ip();
 void *pcap_listener_thread(void *arg);
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
 void *sniffer_thread(void *arg);
 void add_scan_result(t_shared_results *results, const char *ip, int port, int scan_type, const char *status);
 void print_results(t_shared_results *results);
+char *resolve_adress(char *ip);
 
 
 #endif

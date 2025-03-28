@@ -2,6 +2,7 @@
 #define SCAN_RESULT_H
 
 #include "scan_config.h"
+#include <pthread.h>
 
 #define INET_ADDRSTRLEN 16
 

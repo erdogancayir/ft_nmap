@@ -4,6 +4,7 @@
         "scan_result.h": "c",
         "test.h": "c",
         "stdio.h": "c",
-        "pthread.h": "c"
+        "pthread.h": "c",
+        "scan_config.h": "c"
     }
 }

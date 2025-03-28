@@ -19,7 +19,6 @@ int main(int argc, char **argv) {
     t_shared_results shared_results = { .head = NULL };
     pthread_mutex_init(&shared_results.mutex, NULL);
 
-
     pthread_t sniffer_tid;
     pthread_create(&sniffer_tid, NULL, sniffer_thread, (void *)&shared_results);
 

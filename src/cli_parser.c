@@ -74,7 +74,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         if (strcmp(argv[i], "--help") == 0)
             config->show_help = true;
         else if (strcmp(argv[i], "--ip") == 0 && i+1 < argc)
-            config->ip = argv[++i];
+            config->ip = resolve_adress(argv[++i]);
         else if (strcmp(argv[i], "--file") == 0 && i+1 < argc)
             config->ip_file = argv[++i];
         else if (strcmp(argv[i], "--ports") == 0 && i+1 < argc)
