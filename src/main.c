@@ -27,5 +27,7 @@ int main(int argc, char **argv) {
     pthread_cancel(sniffer_tid);  // veya pcap_breakloop ile kibarca
     pthread_join(sniffer_tid, NULL);
 
+    print_results(&shared_results);
+
     return 0;
 }
