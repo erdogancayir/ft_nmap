@@ -36,6 +36,8 @@ typedef struct {
     int tail;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
+
+    bool done;
 } t_job_queue;
 
 void *worker_thread(void *arg);

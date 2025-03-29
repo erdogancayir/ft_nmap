@@ -23,6 +23,10 @@ TEST_NAME = ft_nmap_tests
 # Default target
 all: $(NAME)
 
+# Debug build
+debug: export CFLAGS += -DDEBUG -g
+debug: re
+
 # Uygulama binary'si
 $(NAME): $(OBJS)
 	@echo "🔗 Linking $(NAME)..."

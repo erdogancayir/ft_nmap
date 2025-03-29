@@ -4,16 +4,16 @@
 #include "scan_result.h"
 #include <pthread.h>
 
+volatile sig_atomic_t stop_sniffer = 0;
+
 int main(int argc, char **argv) {
+
     t_scan_config config;
     parse_args(argc, argv, &config);
 
     // Job queue init
     t_job_queue queue;
     init_job_queue(&queue, config.ip, config);
-
-    if (config.speedup <= 0) config.speedup = 1;
-    if (config.speedup > 250) config.speedup = 250;
 
     // Shared results for pcap thread
     t_shared_results shared_results = { .head = NULL };
@@ -24,7 +24,9 @@ int main(int argc, char **argv) {
 
     start_thread_pool(&queue, config.speedup);
 
-    pthread_cancel(sniffer_tid);  // veya pcap_breakloop ile kibarca
+    sleep(2); // Allow some time for packets to be sent
+    stop_sniffer = 1;
+
     pthread_join(sniffer_tid, NULL);
 
     print_results(&shared_results);

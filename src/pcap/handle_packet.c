@@ -39,16 +39,15 @@ static int extract_scan_type_from_dst_port(int dst_port) {
 static void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip) {
     const struct tcphdr *tcp = (const struct tcphdr *)(packet + ETHERNET_HDR_LEN + ip_header_len);
     int src_port = ntohs(tcp->th_sport);
-    int dst_port = ntohs(tcp->th_dport);
     uint8_t flags = tcp->th_flags;
 
-    int scan_type = extract_scan_type_from_dst_port(dst_port);
+    int scan_type = extract_scan_type_from_dst_port(src_port);
 
     if (flags & TH_SYN && flags & TH_ACK) {
-        printf("SYN-ACK received\n");
+        //printf("SYN-ACK received\n");
         add_scan_result(results, src_ip, src_port, scan_type, "Open");
     } else if (flags & TH_RST) {
-        printf("RST received\n");
+        //printf("RST received\n");
         if (scan_type == SCAN_ACK)
             add_scan_result(results, src_ip, src_port, scan_type, "Unfiltered");
         else

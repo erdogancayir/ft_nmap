@@ -8,6 +8,13 @@
 #include <pcap.h>
 #include "scan_result.h"
 
+#ifndef DEBUG
+    #define DEBUG_PRINT(...) do { if (0) fprintf(stderr, __VA_ARGS__); } while (0)
+#else
+    #define DEBUG_PRINT(...) fprintf(stderr, __VA_ARGS__)
+#endif
+
+extern volatile sig_atomic_t stop_sniffer;
 
 char *find_source_ip();
 void *pcap_listener_thread(void *arg);

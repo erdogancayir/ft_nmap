@@ -2,6 +2,9 @@
 #include <pthread.h>
 
 void add_scan_result(t_shared_results *results, const char *ip, int port, int scan_type, const char *status) {
+
+    printf("Adding scan result: %s:%d (type: %d, status: %s)\n", ip, port, scan_type, status);
+
     // 1. Yeni bir result node oluştur
     t_scan_result *new_result = malloc(sizeof(t_scan_result));
     new_result->ip = strdup(ip);

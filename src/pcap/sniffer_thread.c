@@ -33,8 +33,10 @@ void *sniffer_thread(void *arg) {
     }
 
     // 4. Paketleri dinlemeye başla
-    pcap_loop(handle, -1, packet_handler, (unsigned char *)results);
-
+    while (!stop_sniffer) {
+        pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
+    }
+    printf("Sniffer thread stopped.\n");
     pcap_close(handle);
     pthread_exit(NULL);
 }
