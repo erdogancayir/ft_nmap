@@ -13,7 +13,8 @@ int main(int argc, char **argv) {
 
     // Job queue init
     t_job_queue queue;
-    init_job_queue(&queue, config.ip, config);
+
+    init_job_queue(&queue, config.my_ip, config);
 
     // Shared results for pcap thread
     t_shared_results shared_results = { .head = NULL, .interface = config.my_interface, .target_ip = config.ip, .my_ip = config.my_ip };

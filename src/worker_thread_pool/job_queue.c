@@ -1,5 +1,6 @@
 #include "job_queue.h"
 #include "scan_config.h"
+#include "ft_nmap.h"
 
 void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     q->head = q->tail = 0;
@@ -15,7 +16,7 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
             t_scan_job job;
             job.target_ip = config.ip;
             job.target_port = config.ports[i];
-            job.src_port = 40000 + i; // farklı source portlar
+            job.src_port = PORT_SCAN_BASE + i; // different src port for each job
             job.type = config.scan_types[j];
             enqueue_job(q, job);
         }

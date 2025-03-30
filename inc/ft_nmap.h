@@ -9,6 +9,11 @@
 #include "scan_result.h"
 #include <signal.h>
 
+#define ETHERNET_HDR_LEN 14
+#define PORT_SCAN_BASE 40000
+#define SCAN_TYPE_OFFSET 1000
+
+
 #ifndef DEBUG
     #define DEBUG_PRINT(...) do { if (0) fprintf(stderr, __VA_ARGS__); } while (0)
 #else

@@ -28,10 +28,6 @@ struct icmphdr {
 };
 #endif
 
-#define ETHERNET_HDR_LEN 14
-#define PORT_SCAN_BASE 40000
-#define SCAN_TYPE_OFFSET 1000
-
 static int extract_scan_type_from_dst_port(int dst_port) {
     return (dst_port - PORT_SCAN_BASE) / SCAN_TYPE_OFFSET;
 }
