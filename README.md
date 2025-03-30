@@ -97,7 +97,7 @@ sudo ./ft_nmap [OPTIONS]
 ```
 </details>
 
-## 💻 Usage
+## Usage
 <details>
 <summary>Click to expand</summary>
 
@@ -175,7 +175,7 @@ Port Service Name (if applicable) Results Conclusion
 - Detects ICMP port unreachable messages
 </details>
 
-## 🏗️ Architecture
+## Architecture
 <details>
 <summary>Click to expand</summary>
 
@@ -511,7 +511,7 @@ sudo yum install libpcap-devel
 ```
 </details>
 
-## 🚀 Installation
+## Installation
 <details>
 <summary>Click to expand</summary>
 
