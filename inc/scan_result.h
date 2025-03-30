@@ -19,6 +19,9 @@ typedef struct s_scan_result {
 typedef struct s_shared_results {
     t_scan_result *head;
     pthread_mutex_t mutex;
+    char *interface;
+    char *target_ip;
+    char *my_ip;
 } t_shared_results;
 
 #endif

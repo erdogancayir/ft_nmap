@@ -16,7 +16,8 @@
 
 extern volatile sig_atomic_t stop_sniffer;
 
-char *find_source_ip();
+
+bool find_source_ip_and_iface(char **ip_out, char **iface_out);
 void *pcap_listener_thread(void *arg);
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
 void *sniffer_thread(void *arg);

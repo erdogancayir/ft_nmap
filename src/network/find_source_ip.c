@@ -1,33 +1,29 @@
-
-#include <net/if.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ifaddrs.h>
-#include <netinet/in.h>
+#include <net/if.h>
 #include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netdb.h>
-#include <sys/ioctl.h>
+#include <stdbool.h>
 
-
-char *find_source_ip()
-{
+bool find_source_ip_and_iface(char **ip_out, char **iface_out) {
     struct ifaddrs *ifaddr, *ifa;
     char host[NI_MAXHOST];
 
-    if (getifaddrs(&ifaddr) == -1)
-    {
+    if (getifaddrs(&ifaddr) == -1) {
         perror("getifaddrs failed");
-        return NULL;
+        return false;
     }
 
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next)
-    {
-        if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_INET)
-        {
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (!ifa->ifa_addr) continue;
+
+        if (ifa->ifa_addr->sa_family == AF_INET &&
+            (ifa->ifa_flags & IFF_UP) &&
+            (ifa->ifa_flags & IFF_RUNNING) &&
+            !(ifa->ifa_flags & IFF_LOOPBACK)) {
+
             int result = getnameinfo(
                 ifa->ifa_addr,
                 sizeof(struct sockaddr_in),
@@ -37,24 +33,15 @@ char *find_source_ip()
                 0,
                 NI_NUMERICHOST);
 
-            if (result == 0 && strcmp(ifa->ifa_name, "lo") != 0)
-            {
-                char *source_ip = strdup(host);
-
-                if (!*source_ip)
-                {
-                    perror("Memory allocation failed");
-                    freeifaddrs(ifaddr);
-                    return NULL;
-                }
-
+            if (result == 0) {
+                *ip_out = strdup(host);
+                *iface_out = strdup(ifa->ifa_name);
                 freeifaddrs(ifaddr);
-                
-                return source_ip;
+                return true;
             }
         }
     }
 
     freeifaddrs(ifaddr);
-    return NULL;
+    return false;
 }

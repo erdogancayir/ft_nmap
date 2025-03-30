@@ -68,7 +68,16 @@ int parse_scan_types(const char *input, scan_type *scans) {
 void parse_args(int argc, char **argv, t_scan_config *config) {
     memset(config, 0, sizeof(*config));
 
-    config->my_ip = find_source_ip();
+    char *my_ip = NULL;
+    char *my_iface = NULL;
+    
+    if (!find_source_ip_and_iface(&my_ip, &my_iface)) {
+        fprintf(stderr, "❌ IP ve interface bulunamadı!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    config->my_ip = my_ip;
+    config->my_interface = my_iface;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0)
@@ -123,6 +132,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
 
 void DEBUG_CONFIG(const t_scan_config *config) {
     DEBUG_PRINT("🔍 Config Ayarları:\n");
+    DEBUG_PRINT("  Interface: %s\n", config->my_interface ? config->my_interface : "None");
     DEBUG_PRINT("  IP: %s\n", config->ip ? config->ip : "None");
     DEBUG_PRINT("  IP File: %s\n", config->ip_file ? config->ip_file : "None");
 

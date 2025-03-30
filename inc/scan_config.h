@@ -21,6 +21,7 @@ typedef struct {
     int speedup;
     bool show_help;
     char *my_ip;
+    char *my_interface;
 } t_scan_config;
 
 

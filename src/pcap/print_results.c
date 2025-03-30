@@ -7,8 +7,6 @@
 #include <pthread.h>
 #include "scan_type.h"
 
-const char *scan_type_to_str(int type);
-
 void print_results(t_shared_results *results) {
     printf("\n==================== Scan Results ====================\n");
 

@@ -37,6 +37,8 @@ static int extract_scan_type_from_dst_port(int dst_port) {
 }
 
 static void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip) {
+   DEBUG_PRINT("Packet received: %s\n", src_ip);
+   
     const struct tcphdr *tcp = (const struct tcphdr *)(packet + ETHERNET_HDR_LEN + ip_header_len);
     int src_port = ntohs(tcp->th_sport);
     uint8_t flags = tcp->th_flags;

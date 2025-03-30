@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     init_job_queue(&queue, config.ip, config);
 
     // Shared results for pcap thread
-    t_shared_results shared_results = { .head = NULL };
+    t_shared_results shared_results = { .head = NULL, .interface = config.my_interface, .target_ip = config.ip, .my_ip = config.my_ip };
     pthread_mutex_init(&shared_results.mutex, NULL);
 
     pthread_t sniffer_tid;
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 
     start_thread_pool(&queue, config.speedup);
 
-    sleep(2); // Allow some time for packets to be sent
+    sleep(15);
     stop_sniffer = 1;
 
     pthread_join(sniffer_tid, NULL);

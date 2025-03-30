@@ -11,4 +11,6 @@ typedef enum
     SCAN_UDP
 } scan_type;
 
+const char *scan_type_to_str(int type);
+
 #endif
