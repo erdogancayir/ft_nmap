@@ -31,9 +31,8 @@ void *sniffer_thread(void *arg) {
     //          "(icmp and src host %s) or "
     //          "(udp and src host %s)",
     //          results->target_ip, results->target_ip, results->target_ip);
+    snprintf(filter_exp, 100, "((tcp) and (dst host %s))", results->target_ip);
 
-    snprintf(filter_exp, sizeof(filter_exp), "tcp and src host %s", results->target_ip);
-    
     DEBUG_PRINT("Applied BPF filter: %s\n", filter_exp);
     
     if (pcap_compile(handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1 ||

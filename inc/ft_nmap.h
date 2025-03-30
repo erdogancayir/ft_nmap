@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <pcap.h>
 #include "scan_result.h"
+#include <signal.h>
 
 #ifndef DEBUG
     #define DEBUG_PRINT(...) do { if (0) fprintf(stderr, __VA_ARGS__); } while (0)

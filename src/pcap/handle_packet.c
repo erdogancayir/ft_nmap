@@ -37,24 +37,50 @@ static int extract_scan_type_from_dst_port(int dst_port) {
 }
 
 static void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip) {
-   DEBUG_PRINT("Packet received: %s\n", src_ip);
-   
+    DEBUG_PRINT("\n=== TCP Packet Details ===\n");
+    DEBUG_PRINT("Source IP: %s\n", src_ip);
+    
     const struct tcphdr *tcp = (const struct tcphdr *)(packet + ETHERNET_HDR_LEN + ip_header_len);
-    int src_port = ntohs(tcp->th_sport);
-    uint8_t flags = tcp->th_flags;
 
-    int scan_type = extract_scan_type_from_dst_port(src_port);
+    int src_port = ntohs(tcp->th_dport);  // Hedefteki gerçek port (örneğin 22)
+    int dst_port = ntohs(tcp->th_sport);  // Bizim tarafımızdan atanmış port (örneğin 40000)
+    uint8_t flags = tcp->th_flags;
+    uint32_t seq = ntohl(tcp->th_seq);
+    uint32_t ack = ntohl(tcp->th_ack);
+    uint16_t window = ntohs(tcp->th_win);
+    uint16_t checksum = ntohs(tcp->th_sum);
+
+    DEBUG_PRINT("Source Port: %d\n", src_port);
+    DEBUG_PRINT("Destination Port: %d\n", dst_port);
+    DEBUG_PRINT("Sequence Number: %u\n", seq);
+    DEBUG_PRINT("Acknowledgment Number: %u\n", ack);
+    DEBUG_PRINT("Window Size: %d\n", window);
+    DEBUG_PRINT("Checksum: 0x%04x\n", checksum);
+    DEBUG_PRINT("Flags: 0x%02x (", flags);
+    if (flags & TH_FIN) DEBUG_PRINT("FIN ");
+    if (flags & TH_SYN) DEBUG_PRINT("SYN ");
+    if (flags & TH_RST) DEBUG_PRINT("RST ");
+    if (flags & TH_PUSH) DEBUG_PRINT("PSH ");
+    if (flags & TH_ACK) DEBUG_PRINT("ACK ");
+    if (flags & TH_URG) DEBUG_PRINT("URG ");
+    DEBUG_PRINT(")\n");
+
+    int scan_type = extract_scan_type_from_dst_port(dst_port);  // ✅ FIX
+    DEBUG_PRINT("Extracted Scan Type: %d\n", scan_type);
 
     if (flags & TH_SYN && flags & TH_ACK) {
-        //printf("SYN-ACK received\n");
+        DEBUG_PRINT("SYN-ACK received for port %d\n", src_port);
         add_scan_result(results, src_ip, src_port, scan_type, "Open");
     } else if (flags & TH_RST) {
-        //printf("RST received\n");
+        DEBUG_PRINT("RST received for port %d\n", src_port);
         if (scan_type == SCAN_ACK)
             add_scan_result(results, src_ip, src_port, scan_type, "Unfiltered");
         else
             add_scan_result(results, src_ip, src_port, scan_type, "Closed");
+    } else {
+        DEBUG_PRINT("Other TCP flags received for port %d\n", src_port);
     }
+    DEBUG_PRINT("=======================\n\n");
 }
 
 static void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip) {

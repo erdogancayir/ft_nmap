@@ -44,5 +44,12 @@ void *worker_thread(void *arg) {
         usleep(1000);
     }
 
+    // Mark queue as done when this worker thread finishes
+    pthread_mutex_lock(&q->mutex);
+    if (q->head == q->tail) {
+        q->done = true;
+    }
+    pthread_mutex_unlock(&q->mutex);
+
     return NULL;
 }
