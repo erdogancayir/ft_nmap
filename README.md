@@ -17,6 +17,8 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
 - [License](#license)
 
 ## Features
+<details>
+<summary>Click to expand</summary>
 
 - **Multiple Scan Types**
   - TCP SYN scan (half-open)
@@ -38,15 +40,21 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
   - Detailed scan results
   - Progress indication
   - Service name mapping
+</details>
 
 ## Prerequisites
+<details>
+<summary>Click to expand</summary>
 
 - C compiler (gcc/clang)
 - Make
 - libpcap development library
 - Root privileges (for raw socket operations)
+</details>
 
 ### Installing Dependencies
+<details>
+<summary>Click to expand</summary>
 
 **macOS:**
 ```bash
@@ -62,8 +70,11 @@ sudo apt-get install libpcap-dev
 ```bash
 sudo yum install libpcap-devel
 ```
+</details>
 
 ## 🚀 Installation
+<details>
+<summary>Click to expand</summary>
 
 1. Clone the repository:
 ```bash
@@ -80,8 +91,11 @@ make
 ```bash
 sudo ./ft_nmap [OPTIONS]
 ```
+</details>
 
 ## 💻 Usage
+<details>
+<summary>Click to expand</summary>
 
 ### Basic Syntax
 ```bash
@@ -139,8 +153,11 @@ Port Service Name (if applicable) Results Conclusion
 ----------------------------------------------------------------------------------------
 90 Unassigned SYN(Filtered) Filtered
 ```
+</details>
 
 ## Scan Types
+<details>
+<summary>Click to expand</summary>
 
 ### TCP Scans
 - **SYN Scan**: Half-open scan, sends SYN packet
@@ -152,8 +169,11 @@ Port Service Name (if applicable) Results Conclusion
 ### UDP Scan
 - Sends UDP packet
 - Detects ICMP port unreachable messages
+</details>
 
 ## 🏗️ Architecture
+<details>
+<summary>Click to expand</summary>
 
 ### Core Components
 1. **Job Queue System**
@@ -249,6 +269,7 @@ The job queue will contain:
    - No job duplication
    - No missed jobs
    - Graceful error handling
+</details>
 
 ## Development
 
