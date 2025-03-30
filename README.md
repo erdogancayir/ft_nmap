@@ -710,13 +710,6 @@ The job queue will contain:
    - Graceful error handling
 </details>
 
-## Development
-
-### Project Structure
-```
-```
-</details>
-
 ## Technical Deep Dive
 <details>
 <summary>Click to expand</summary>
