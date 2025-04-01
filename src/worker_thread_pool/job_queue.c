@@ -7,7 +7,6 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     q->done = false;
 
     pthread_mutex_init(&q->mutex, NULL);
-    pthread_cond_init(&q->cond, NULL);
     q->my_ip = my_ip;
 
      // Job enqueue
@@ -24,31 +23,33 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
 }
 
 bool enqueue_job(t_job_queue *q, t_scan_job job) {
-    pthread_mutex_lock(&q->mutex);
     int next = (q->tail + 1) % MAX_QUEUE;
     if (next == q->head) {
-        pthread_mutex_unlock(&q->mutex);
         return false; // full
     }
     q->jobs[q->tail] = job;
     q->tail = next;
-    pthread_cond_signal(&q->cond);
-    pthread_mutex_unlock(&q->mutex);
     return true;
 }
 
 bool dequeue_job(t_job_queue *q, t_scan_job *job) {
+    DEBUG_PRINT("Dequeue job from queue\n");
     pthread_mutex_lock(&q->mutex);
+    
     while (q->head == q->tail) {
         if (q->done) {
             pthread_mutex_unlock(&q->mutex);
+            DEBUG_PRINT("Queue is done and empty, exiting...\n");
             return false;
         }
-
-        pthread_cond_wait(&q->cond, &q->mutex);
+        pthread_cond_wait(&q->cond, &q->mutex); // Bekle ama done değişirse uyan
     }
+
     *job = q->jobs[q->head];
     q->head = (q->head + 1) % MAX_QUEUE;
+
     pthread_mutex_unlock(&q->mutex);
+
+    DEBUG_PRINT("Dequeued job: %s:%d\n", job->target_ip, job->target_port);
     return true;
 }

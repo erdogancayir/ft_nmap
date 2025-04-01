@@ -3,6 +3,7 @@
 
 #include "scan_config.h"
 #include <pthread.h>
+#include <pcap.h>
 
 #define INET_ADDRSTRLEN 16
 
@@ -19,9 +20,13 @@ typedef struct s_scan_result {
 typedef struct s_shared_results {
     t_scan_result *head;
     pthread_mutex_t mutex;
+    pthread_cond_t cond;       // ✅ condition variable
+    bool sniffer_done;         // ✅ sniffer işini bitirdi mi?
     char *interface;
     char *target_ip;
     char *my_ip;
+    pcap_t *pcap_handle; // pcap handle
+    bool scan_done;      // ✅ scan işini bitirdi mi?
 } t_shared_results;
 
 #endif

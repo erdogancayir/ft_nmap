@@ -4,8 +4,6 @@
 #include "scan_result.h"
 #include <pthread.h>
 
-volatile sig_atomic_t stop_sniffer = 0;
-
 int main(int argc, char **argv) {
 
     t_scan_config config;
@@ -24,9 +22,6 @@ int main(int argc, char **argv) {
     pthread_create(&sniffer_tid, NULL, sniffer_thread, (void *)&shared_results);
 
     start_thread_pool(&queue, config.speedup);
-
-    sleep(15);
-    stop_sniffer = 1;
 
     pthread_join(sniffer_tid, NULL);
 
