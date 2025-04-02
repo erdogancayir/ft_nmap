@@ -35,7 +35,19 @@ void *sniffer_thread(void *arg) {
         pthread_exit(NULL);
     }
      
-    pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
+    int timeout_counter = 0;
+    while (timeout_counter < 2 && results->job_count > 0) { // Adjust max wait (in iterations)
+        int ret = pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
+        if (ret == 0) {
+            DEBUG_PRINT("No packets received.\n");
+            usleep(1000); // wait a little for new packets
+            timeout_counter++;
+        } else {
+            DEBUG_PRINT("Received %d packets.\n", ret);
+            results->job_count -= ret;
+            timeout_counter = 0; // reset if packets received
+        }
+    }
 
     DEBUG_PRINT("Sniffer exiting after timeout.\n");
 
