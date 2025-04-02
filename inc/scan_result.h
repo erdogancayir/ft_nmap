@@ -25,8 +25,6 @@ typedef struct s_shared_results {
     char *interface;
     char *target_ip;
     char *my_ip;
-    pcap_t *pcap_handle; // pcap handle
-    bool scan_done;      // ✅ scan işini bitirdi mi?
 } t_shared_results;
 
 #endif

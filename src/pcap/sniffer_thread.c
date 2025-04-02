@@ -6,6 +6,7 @@
 #include "scan_result.h"
 #include "ft_nmap.h"
 #include <unistd.h>
+#include <time.h>
 
 void *sniffer_thread(void *arg) {
     t_shared_results *results = (t_shared_results *)arg;
@@ -33,28 +34,10 @@ void *sniffer_thread(void *arg) {
         pcap_close(handle);
         pthread_exit(NULL);
     }
-
      
-    time_t last_packet_time = time(NULL);
-    results->pcap_handle = handle;  // pcap_breakloop için lazim
+    pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
 
-    while (1) {
-        int res = pcap_dispatch(handle, 10, packet_handler, (unsigned char *)results);
-        break;
-        
-        if (res > 0) {
-            DEBUG_PRINT("Captured %d packet(s).\n", res);
-            last_packet_time = time(NULL);
-        } else {
-            time_t now = time(NULL);
-            if (difftime(now, last_packet_time) >= 3) {
-                DEBUG_PRINT("Timeout: No packets received in the last %d seconds.\n", 3);
-                break;
-            }
-        }
-
-        usleep(100000); // avoid busy loop
-    }
+    DEBUG_PRINT("Sniffer exiting after timeout.\n");
 
     pcap_close(handle);
     pthread_exit(NULL);
