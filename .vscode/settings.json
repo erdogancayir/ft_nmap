@@ -6,6 +6,9 @@
         "stdio.h": "c",
         "pthread.h": "c",
         "scan_config.h": "c",
-        "ft_nmap.h": "c"
+        "ft_nmap.h": "c",
+        "tcp.h": "c",
+        "string.h": "c",
+        "ip.h": "c"
     }
 }

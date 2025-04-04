@@ -26,6 +26,8 @@ typedef struct s_shared_results {
     char *target_ip;
     char *my_ip;
     int job_count;
+
+    int response_count;
 } t_shared_results;
 
 #endif

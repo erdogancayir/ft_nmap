@@ -33,6 +33,6 @@ void add_scan_result(t_shared_results *results, const char *ip, int port, int sc
 void print_results(t_shared_results *results);
 char *resolve_adress(char *ip);
 void print_tcp_packet_debug(const struct tcphdr *tcp, const char *src_ip, int matched_port);
-
+void print_packet_debug(const struct ip *ip_hdr, const struct tcphdr *tcp_hdr, const char *src_ip, const char *dst_ip);
 
 #endif

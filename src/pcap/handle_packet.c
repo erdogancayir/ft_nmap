@@ -35,24 +35,23 @@ static int extract_scan_type_from_dst_port(int dst_port) {
 static void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip) {
     const struct tcphdr *tcp = (const struct tcphdr *)(packet + ETHERNET_HDR_LEN + ip_header_len);
 
-    int src_port = ntohs(tcp->th_dport);  // Hedefteki gerçek port (örneğin 22)
-    int dst_port = ntohs(tcp->th_sport);  // Bizim tarafımızdan atanmış port (örneğin 40000)
+    int src_port = ntohs(tcp->th_dport); // my port
+    int dst_scan_port = ntohs(tcp->th_sport);
     uint8_t flags = tcp->th_flags;
 
-    print_tcp_packet_debug(tcp, src_ip, dst_port);
+    print_tcp_packet_debug(tcp, src_ip, dst_scan_port);
 
     int scan_type = extract_scan_type_from_dst_port(src_port);  // ✅ FIX
-    int source_port = PORT_SCAN_BASE - src_port;
 
     if (flags & TH_SYN && flags & TH_ACK) {
-        add_scan_result(results, src_ip, source_port, scan_type, "Open");
+        add_scan_result(results, src_ip, dst_scan_port, scan_type, "Open");
     } else if (flags & TH_RST) {
         if (scan_type == SCAN_ACK)
-            add_scan_result(results, src_ip, source_port, scan_type, "Unfiltered");
+            add_scan_result(results, src_ip, dst_scan_port, scan_type, "Unfiltered");
         else
-            add_scan_result(results, src_ip, source_port, scan_type, "Closed");
+            add_scan_result(results, src_ip, dst_scan_port, scan_type, "Closed");
     } else {
-        DEBUG_PRINT("Other TCP flags received for port %d\n", source_port);
+        DEBUG_PRINT("Other TCP flags received for port %d\n", dst_scan_port);
     }
 }
 
@@ -85,8 +84,11 @@ static void handle_icmp_packet(const u_char *packet, int ip_header_len, t_shared
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {
     (void)header;
 
-
     t_shared_results *results = (t_shared_results *)args;
+
+    pthread_mutex_lock(&results->mutex);
+        results->response_count++;
+    pthread_mutex_unlock(&results->mutex);
 
     // Basic safety check
     if (!packet) return;

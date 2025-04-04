@@ -20,7 +20,8 @@ int main(int argc, char **argv) {
         .interface = config.my_interface, 
         .target_ip = config.ip, 
         .my_ip = config.my_ip,
-        .job_count = queue.tail
+        .job_count = queue.tail,
+        .response_count = 0
     };
     pthread_mutex_init(&shared_results.mutex, NULL);
 
