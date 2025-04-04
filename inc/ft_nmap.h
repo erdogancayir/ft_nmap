@@ -8,6 +8,8 @@
 #include <pcap.h>
 #include "scan_result.h"
 #include <signal.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
 
 #define ETHERNET_HDR_LEN 14
 #define PORT_SCAN_BASE 40000
@@ -30,6 +32,7 @@ void *sniffer_thread(void *arg);
 void add_scan_result(t_shared_results *results, const char *ip, int port, int scan_type, const char *status);
 void print_results(t_shared_results *results);
 char *resolve_adress(char *ip);
+void print_tcp_packet_debug(const struct tcphdr *tcp, const char *src_ip, int matched_port);
 
 
 #endif
