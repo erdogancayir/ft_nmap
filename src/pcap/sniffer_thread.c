@@ -5,8 +5,8 @@
 #include <pthread.h>
 #include "scan_result.h"
 #include "ft_nmap.h"
+#include <stdio.h>
 #include <unistd.h>
-#include <time.h>
 
 void *sniffer_thread(void *arg) {
     t_shared_results *results = (t_shared_results *)arg;
@@ -24,7 +24,8 @@ void *sniffer_thread(void *arg) {
 
     struct bpf_program fp;
     char filter_exp[256];
-    snprintf(filter_exp, 100, "((tcp) and (dst host %s))", results->target_ip);
+    snprintf(filter_exp, sizeof(filter_exp), "tcp and src host %s and dst host %s", results->target_ip, results->my_ip);
+
 
     DEBUG_PRINT("Applied BPF filter: %s\n", filter_exp);
     
@@ -34,22 +35,26 @@ void *sniffer_thread(void *arg) {
         pcap_close(handle);
         pthread_exit(NULL);
     }
-     
-    int timeout_counter = 0;
-    while (timeout_counter < 2 && results->job_count > 0) { // Adjust max wait (in iterations)
-        int ret = pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
-        if (ret == 0) {
-            DEBUG_PRINT("No packets received.\n");
-            usleep(1000); // wait a little for new packets
-            timeout_counter++;
-        } else {
-            DEBUG_PRINT("Received %d packets.\n", ret);
-            results->job_count -= ret;
-            timeout_counter = 0; // reset if packets received
-        }
-    }
 
-    DEBUG_PRINT("Sniffer exiting after timeout.\n");
+    DEBUG_PRINT("%d packets to process\n", results->job_count);
+    //pcap_dispatch(handle, results->job_count, packet_handler, (unsigned char *)results);
+
+    while (true) {
+	    int ret = pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
+        if (ret >= 0) {
+            printf("ret dispatch %d\n", ret);
+        }
+        if (ret == -1) {
+            DEBUG_PRINT("error:!!!!!!!!!!\n");
+        }
+        if (ret == -2) {
+			// printf("breakloop: No packets\n");
+
+            break ;
+        }
+
+        DEBUG_PRINT("pcap_dispatch() returned %d packets\n", ret);
+    }
 
     pcap_close(handle);
     pthread_exit(NULL);

@@ -15,7 +15,13 @@ int main(int argc, char **argv) {
     init_job_queue(&queue, config.my_ip, config);
 
     // Shared results for pcap thread
-    t_shared_results shared_results = { .head = NULL, .interface = config.my_interface, .target_ip = config.ip, .my_ip = config.my_ip };
+    t_shared_results shared_results = {
+        .head = NULL, 
+        .interface = config.my_interface, 
+        .target_ip = config.ip, 
+        .my_ip = config.my_ip,
+        .job_count = queue.tail
+    };
     pthread_mutex_init(&shared_results.mutex, NULL);
 
     pthread_t sniffer_tid;

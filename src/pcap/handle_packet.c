@@ -61,20 +61,22 @@ static void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_
     if (flags & TH_URG) DEBUG_PRINT("URG ");
     DEBUG_PRINT(")\n");
 
-    int scan_type = extract_scan_type_from_dst_port(dst_port);  // ✅ FIX
+    int scan_type = extract_scan_type_from_dst_port(src_port);  // ✅ FIX
     DEBUG_PRINT("Extracted Scan Type: %d\n", scan_type);
 
+    int source_port = PORT_SCAN_BASE - src_port;
+
     if (flags & TH_SYN && flags & TH_ACK) {
-        DEBUG_PRINT("SYN-ACK received for port %d\n", src_port);
-        add_scan_result(results, src_ip, src_port, scan_type, "Open");
+        DEBUG_PRINT("SYN-ACK received for port %d\n", source_port);
+        add_scan_result(results, src_ip, source_port, scan_type, "Open");
     } else if (flags & TH_RST) {
-        DEBUG_PRINT("RST received for port %d\n", src_port);
+        DEBUG_PRINT("RST received for port %d\n", source_port);
         if (scan_type == SCAN_ACK)
-            add_scan_result(results, src_ip, src_port, scan_type, "Unfiltered");
+            add_scan_result(results, src_ip, source_port, scan_type, "Unfiltered");
         else
-            add_scan_result(results, src_ip, src_port, scan_type, "Closed");
+            add_scan_result(results, src_ip, source_port, scan_type, "Closed");
     } else {
-        DEBUG_PRINT("Other TCP flags received for port %d\n", src_port);
+        DEBUG_PRINT("Other TCP flags received for port %d\n", source_port);
     }
     DEBUG_PRINT("=======================\n\n");
 }
