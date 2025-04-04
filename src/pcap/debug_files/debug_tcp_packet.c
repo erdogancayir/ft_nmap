@@ -6,52 +6,63 @@
 #include <arpa/inet.h>
 #include "ft_nmap.h"
 
+// ANSI color codes
+#define CLR_RESET     "\x1b[0m"
+#define CLR_BOLD      "\x1b[1m"
+#define CLR_BLUE      "\x1b[34m"
+#define CLR_GREEN     "\x1b[32m"
+#define CLR_YELLOW    "\x1b[33m"
+#define CLR_CYAN      "\x1b[36m"
+
 void print_tcp_packet_debug(const struct tcphdr *tcp, const char *src_ip, int matched_port) {
-    DEBUG_PRINT("\n=== TCP Packet Details ===\n");
-    DEBUG_PRINT("Source IP: %s\n", src_ip);
-    DEBUG_PRINT("Matched Port: %d\n", matched_port);
-    DEBUG_PRINT("Flags: 0x%02x (", tcp->th_flags);
-    if (tcp->th_flags & TH_SYN) DEBUG_PRINT("SYN ");
-    if (tcp->th_flags & TH_ACK) DEBUG_PRINT("ACK ");
-    if (tcp->th_flags & TH_RST) DEBUG_PRINT("RST ");
-    if (tcp->th_flags & TH_FIN) DEBUG_PRINT("FIN ");
-    if (tcp->th_flags & TH_PUSH) DEBUG_PRINT("PUSH ");
-    if (tcp->th_flags & TH_URG) DEBUG_PRINT("URG ");
+    DEBUG_PRINT(CLR_BLUE "\n=== TCP Packet Details ===\n" CLR_RESET);
+    DEBUG_PRINT("Source IP     : " CLR_GREEN "%s\n" CLR_RESET, src_ip);
+    DEBUG_PRINT("Matched Port  : " CLR_GREEN "%d\n" CLR_RESET, matched_port);
+
+    DEBUG_PRINT("Flags         : " CLR_YELLOW "0x%02x (" CLR_RESET, tcp->th_flags);
+    if (tcp->th_flags & TH_SYN) DEBUG_PRINT(CLR_YELLOW "SYN " CLR_RESET);
+    if (tcp->th_flags & TH_ACK) DEBUG_PRINT(CLR_YELLOW "ACK " CLR_RESET);
+    if (tcp->th_flags & TH_RST) DEBUG_PRINT(CLR_YELLOW "RST " CLR_RESET);
+    if (tcp->th_flags & TH_FIN) DEBUG_PRINT(CLR_YELLOW "FIN " CLR_RESET);
+    if (tcp->th_flags & TH_PUSH) DEBUG_PRINT(CLR_YELLOW "PUSH " CLR_RESET);
+    if (tcp->th_flags & TH_URG) DEBUG_PRINT(CLR_YELLOW "URG " CLR_RESET);
     DEBUG_PRINT(")\n");
-    DEBUG_PRINT("=======================\n");
+    DEBUG_PRINT(CLR_BLUE "=======================\n" CLR_RESET);
 }
 
 void print_packet_debug(const struct ip *ip_hdr, const struct tcphdr *tcp_hdr, const char *src_ip, const char *dst_ip) {
     // IP Header
-    DEBUG_PRINT("\n=== IP Header ===\n");
-    DEBUG_PRINT("Version: %d\n", ip_hdr->ip_v);
-    DEBUG_PRINT("Header Length: %d bytes\n", ip_hdr->ip_hl * 4);
-    DEBUG_PRINT("Type of Service: %d\n", ip_hdr->ip_tos);
-    DEBUG_PRINT("Total Length: %d bytes\n", ntohs(ip_hdr->ip_len));
-    DEBUG_PRINT("Identification: %d\n", ntohs(ip_hdr->ip_id));
-    DEBUG_PRINT("Time To Live: %d\n", ip_hdr->ip_ttl);
-    DEBUG_PRINT("Protocol: %d (TCP)\n", ip_hdr->ip_p);
-    DEBUG_PRINT("Checksum: 0x%04x\n", ntohs(ip_hdr->ip_sum));
-    DEBUG_PRINT("Source IP: %s\n", src_ip);
-    DEBUG_PRINT("Destination IP: %s\n", dst_ip);
+    DEBUG_PRINT(CLR_BLUE "\n=== IP Header ===\n" CLR_RESET);
+    DEBUG_PRINT("Version        : " CLR_GREEN "%d\n" CLR_RESET, ip_hdr->ip_v);
+    DEBUG_PRINT("Header Length  : " CLR_GREEN "%d bytes\n" CLR_RESET, ip_hdr->ip_hl * 4);
+    DEBUG_PRINT("TOS            : " CLR_GREEN "%d\n" CLR_RESET, ip_hdr->ip_tos);
+    DEBUG_PRINT("Total Length   : " CLR_GREEN "%d bytes\n" CLR_RESET, ntohs(ip_hdr->ip_len));
+    DEBUG_PRINT("Identification : " CLR_GREEN "%d\n" CLR_RESET, ntohs(ip_hdr->ip_id));
+    DEBUG_PRINT("TTL            : " CLR_GREEN "%d\n" CLR_RESET, ip_hdr->ip_ttl);
+    DEBUG_PRINT("Protocol       : " CLR_GREEN "%d (TCP)\n" CLR_RESET, ip_hdr->ip_p);
+    DEBUG_PRINT("Checksum       : " CLR_GREEN "0x%04x\n" CLR_RESET, ntohs(ip_hdr->ip_sum));
+    DEBUG_PRINT("Source IP      : " CLR_CYAN "%s\n" CLR_RESET, src_ip);
+    DEBUG_PRINT("Destination IP : " CLR_CYAN "%s\n" CLR_RESET, dst_ip);
 
     // TCP Header
-    DEBUG_PRINT("\n=== TCP Header ===\n");
-    DEBUG_PRINT("Source Port: %d\n", ntohs(tcp_hdr->th_sport));
-    DEBUG_PRINT("Destination Port: %d\n", ntohs(tcp_hdr->th_dport));
-    DEBUG_PRINT("Sequence Number: %u\n", ntohl(tcp_hdr->th_seq));
-    DEBUG_PRINT("Acknowledgment Number: %u\n", ntohl(tcp_hdr->th_ack));
-    DEBUG_PRINT("Data Offset: %d bytes\n", tcp_hdr->th_off * 4);
-    DEBUG_PRINT("Window Size: %d\n", ntohs(tcp_hdr->th_win));
-    DEBUG_PRINT("Checksum: 0x%04x\n", ntohs(tcp_hdr->th_sum));
-    DEBUG_PRINT("Urgent Pointer: %d\n", ntohs(tcp_hdr->th_urp));
-    DEBUG_PRINT("Flags: 0x%02x (", tcp_hdr->th_flags);
-    if (tcp_hdr->th_flags & TH_FIN) DEBUG_PRINT("FIN ");
-    if (tcp_hdr->th_flags & TH_SYN) DEBUG_PRINT("SYN ");
-    if (tcp_hdr->th_flags & TH_RST) DEBUG_PRINT("RST ");
-    if (tcp_hdr->th_flags & TH_PUSH) DEBUG_PRINT("PSH ");
-    if (tcp_hdr->th_flags & TH_ACK) DEBUG_PRINT("ACK ");
-    if (tcp_hdr->th_flags & TH_URG) DEBUG_PRINT("URG ");
+    DEBUG_PRINT(CLR_BLUE "\n=== TCP Header ===\n" CLR_RESET);
+    DEBUG_PRINT("Source Port    : " CLR_GREEN "%d\n" CLR_RESET, ntohs(tcp_hdr->th_sport));
+    DEBUG_PRINT("Destination Port: " CLR_GREEN "%d\n" CLR_RESET, ntohs(tcp_hdr->th_dport));
+    DEBUG_PRINT("Seq Number     : " CLR_GREEN "%u\n" CLR_RESET, ntohl(tcp_hdr->th_seq));
+    DEBUG_PRINT("Ack Number     : " CLR_GREEN "%u\n" CLR_RESET, ntohl(tcp_hdr->th_ack));
+    DEBUG_PRINT("Data Offset    : " CLR_GREEN "%d bytes\n" CLR_RESET, tcp_hdr->th_off * 4);
+    DEBUG_PRINT("Window Size    : " CLR_GREEN "%d\n" CLR_RESET, ntohs(tcp_hdr->th_win));
+    DEBUG_PRINT("Checksum       : " CLR_GREEN "0x%04x\n" CLR_RESET, ntohs(tcp_hdr->th_sum));
+    DEBUG_PRINT("Urgent Pointer : " CLR_GREEN "%d\n" CLR_RESET, ntohs(tcp_hdr->th_urp));
+
+    DEBUG_PRINT("Flags          : " CLR_YELLOW "0x%02x (" CLR_RESET, tcp_hdr->th_flags);
+    if (tcp_hdr->th_flags & TH_FIN) DEBUG_PRINT(CLR_YELLOW "FIN " CLR_RESET);
+    if (tcp_hdr->th_flags & TH_SYN) DEBUG_PRINT(CLR_YELLOW "SYN " CLR_RESET);
+    if (tcp_hdr->th_flags & TH_RST) DEBUG_PRINT(CLR_YELLOW "RST " CLR_RESET);
+    if (tcp_hdr->th_flags & TH_PUSH) DEBUG_PRINT(CLR_YELLOW "PSH " CLR_RESET);
+    if (tcp_hdr->th_flags & TH_ACK) DEBUG_PRINT(CLR_YELLOW "ACK " CLR_RESET);
+    if (tcp_hdr->th_flags & TH_URG) DEBUG_PRINT(CLR_YELLOW "URG " CLR_RESET);
     DEBUG_PRINT(")\n");
-    DEBUG_PRINT("==================\n\n");
+
+    DEBUG_PRINT(CLR_BLUE "==================\n\n" CLR_RESET);
 }
