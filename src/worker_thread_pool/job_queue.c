@@ -33,7 +33,6 @@ bool enqueue_job(t_job_queue *q, t_scan_job job) {
 }
 
 bool dequeue_job(t_job_queue *q, t_scan_job *job) {
-    DEBUG_PRINT("Dequeue job from queue\n");
     pthread_mutex_lock(&q->mutex);
     
     while (q->head == q->tail) {
@@ -50,6 +49,5 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job) {
 
     pthread_mutex_unlock(&q->mutex);
 
-    DEBUG_PRINT("Dequeued job: %s:%d\n", job->target_ip, job->target_port);
     return true;
 }

@@ -36,10 +36,7 @@ void *worker_thread(void *arg) {
                 break;
         }
 
-        printf("📤 Sent to %-15s Port: %-5d Type: %s\n",
-            job.target_ip,
-            job.target_port,
-            scan_type_to_str(job.type));
+        print_sent_message(job.target_ip, job.target_port, scan_type_to_str(job.type));
 
         usleep(1000);
     }

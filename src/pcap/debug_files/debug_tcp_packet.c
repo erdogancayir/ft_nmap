@@ -66,3 +66,10 @@ void print_packet_debug(const struct ip *ip_hdr, const struct tcphdr *tcp_hdr, c
 
     DEBUG_PRINT(CLR_BLUE "==================\n\n" CLR_RESET);
 }
+
+
+void print_sent_message(const char *ip, int port, const char *scan_type_str) {
+    DEBUG_PRINT(CLR_CYAN "📤 Sent to " CLR_BOLD "%-15s" CLR_RESET 
+           CLR_YELLOW " Port: %-5d Type: %s\n" CLR_RESET,
+           ip, port, scan_type_str);
+}
