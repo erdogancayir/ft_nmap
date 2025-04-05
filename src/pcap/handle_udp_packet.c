@@ -18,7 +18,7 @@ void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results
     int dst_scan_port = ntohs(udp->uh_sport);
     int src_port = ntohs(udp->uh_dport);
 
-    int scan_type = extract_scan_type_from_dst_port(src_port);
+    int scan_type = extract_scan_type_from_dst_port(src_port, results->scan_type_count);
 
     add_scan_result(results, src_ip, dst_scan_port, scan_type, "Open|Filtered");
 }

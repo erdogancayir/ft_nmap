@@ -9,15 +9,19 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     pthread_mutex_init(&q->mutex, NULL);
     q->my_ip = my_ip;
 
-     // Job enqueue
+    int job_index = 0;
+
+    // Job enqueue
     for (int i = 0; i < config.port_count; i++) {
         for (int j = 0; j < config.scan_count; j++) {
             t_scan_job job;
             job.target_ip = config.ip;
             job.target_port = config.ports[i];
-            job.src_port = PORT_SCAN_BASE + i; // different src port for each job
+            job.src_port = PORT_SCAN_BASE + (i * config.scan_count + j);
             job.type = config.scan_types[j];
             enqueue_job(q, job);
+
+            print_job_debug(&job, job_index++);
         }
     }
 }

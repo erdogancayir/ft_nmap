@@ -21,7 +21,8 @@ int main(int argc, char **argv) {
         .target_ip = config.ip, 
         .my_ip = config.my_ip,
         .job_count = queue.tail,
-        .response_count = 0
+        .response_count = 0,
+        .scan_type_count = config.scan_count,
     };
     pthread_mutex_init(&shared_results.mutex, NULL);
 

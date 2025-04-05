@@ -49,5 +49,6 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job);
 void start_thread_pool(t_job_queue *q, int count);
 void *worker_thread(void *arg);
 
+void print_job_debug(const t_scan_job *job, int index);
 
 #endif

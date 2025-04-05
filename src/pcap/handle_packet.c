@@ -13,8 +13,13 @@
 #include "ft_nmap.h"
 #include "job_queue.h"
 
-int extract_scan_type_from_dst_port(int dst_port) {
-    return (dst_port - PORT_SCAN_BASE) / SCAN_TYPE_OFFSET;
+int extract_scan_type_from_dst_port(int src_port, int scan_type_count) {
+    if (src_port < PORT_SCAN_BASE) return -1; // invalid
+
+    DEBUG_PRINT("SRC PORT: %d SCAN TYPE COUNT: %d\n", src_port, scan_type_count);
+    DEBUG_PRINT("PORT SCAN BASE: %d\n", PORT_SCAN_BASE);
+    int index = src_port - PORT_SCAN_BASE;
+    return index % scan_type_count;
 }
 
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet) {

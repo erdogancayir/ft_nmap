@@ -22,7 +22,7 @@ void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results
 
     print_tcp_packet_debug(tcp, src_ip, dst_scan_port);
 
-    int scan_type = extract_scan_type_from_dst_port(src_port);  // ✅ FIX
+    int scan_type = extract_scan_type_from_dst_port(src_port, results->scan_type_count);
 
     if (flags & TH_SYN && flags & TH_ACK) {
         add_scan_result(results, src_ip, dst_scan_port, scan_type, "Open");

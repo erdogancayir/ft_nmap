@@ -41,6 +41,6 @@ void handle_icmp_packet(const u_char *packet, int ip_header_len, t_shared_result
 void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip);
 void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip);
 
-int extract_scan_type_from_dst_port(int dst_port);
+int extract_scan_type_from_dst_port(int dst_port, int scan_type_count);
 
 #endif
