@@ -31,26 +31,36 @@ void *sniffer_thread(void *arg) {
         pthread_exit(NULL);
     }
 
+    // Set non-blocking mode
+    if (pcap_setnonblock(handle, 1, errbuf) == -1) {
+        fprintf(stderr, "Failed to set non-blocking mode: %s\n", errbuf);
+        pcap_close(handle);
+        pthread_exit(NULL);
+    }
+
+    int idle_time = 0;
+
     while (true) {
-	    int ret = pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
-        
+        int ret = pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
+    
         if (ret == -1) {
-            printf("pcap_dispatch error!\n");
-            break;
-        } else if (ret == -2) {
+            fprintf(stderr, "pcap_dispatch error!\n");
             break;
         }
-
-        pthread_mutex_lock(&results->mutex);
-        int done = (results->response_count >= results->job_count);
-        pthread_mutex_unlock(&results->mutex);
-
-        if (done) {
-            DEBUG_PRINT("✅ All expected packets received. Sniffer exiting.\n");
+    
+        if (ret == 0) {
+            usleep(1000); // sleep 1ms
+            idle_time += 1;
+        } else {
+            idle_time = 0; // reset on traffic
+        }
+    
+        if (idle_time > 3000) { // 3 seconds of inactivity
+            DEBUG_PRINT("⏱ Timeout reached: no packet for 3 seconds\n");
             break;
         }
     }
-
+    
     pcap_close(handle);
     pthread_exit(NULL);
 }
