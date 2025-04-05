@@ -13,7 +13,7 @@ void print_results(t_shared_results *results) {
     pthread_mutex_lock(&results->mutex);
 
     printf("\nOpen Ports:\n");
-    printf("Port  Service        Scan-Type         Status\n");
+    printf("Port  Service        Scan-Type         Conclusion\n");
     printf("-----------------------------------------------------\n");
 
     t_scan_result *cur = results->head;
@@ -27,7 +27,7 @@ void print_results(t_shared_results *results) {
     }
 
     printf("\nClosed/Filtered/Unfiltered Ports:\n");
-    printf("Port  Service        Scan-Type         Status\n");
+    printf("Port  Service        Scan-Type         Conclusion\n");
     printf("-----------------------------------------------------\n");
 
     cur = results->head;
