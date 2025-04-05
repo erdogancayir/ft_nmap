@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
+#include "job_queue.h"
 
 #define ETHERNET_HDR_LEN 14
 #define PORT_SCAN_BASE 40000
@@ -29,7 +30,7 @@ bool find_source_ip_and_iface(char **ip_out, char **iface_out);
 void *pcap_listener_thread(void *arg);
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
 void *sniffer_thread(void *arg);
-void add_scan_result(t_shared_results *results, const char *ip, int port, int scan_type, const char *status);
+void add_scan_result(t_shared_results *results, const char *ip, int port, scan_type scan_type, const char *status);
 void print_results(t_shared_results *results);
 char *resolve_adress(char *ip);
 void print_tcp_packet_debug(const struct tcphdr *tcp, const char *src_ip, int matched_port);
@@ -42,5 +43,7 @@ void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results
 void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip);
 
 int extract_scan_type_from_dst_port(int dst_port, int scan_type_count);
+
+void finalize_unanswered_jobs(t_job_queue *queue, t_shared_results *results);
 
 #endif

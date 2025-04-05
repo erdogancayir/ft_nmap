@@ -12,7 +12,7 @@ typedef enum { STATE_UNKNOWN, STATE_OPEN, STATE_CLOSED, STATE_FILTERED } t_state
 typedef struct s_scan_result {
     char *ip;
     int port;
-    int scan_type; // SYN, NULL, vs.
+    scan_type scan_type; // SYN, NULL, vs.
     char *status;  // Open, Filtered, Closed
     struct s_scan_result *next;
 } t_scan_result;

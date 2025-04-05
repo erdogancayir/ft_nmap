@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
         .response_count = 0,
         .scan_type_count = config.scan_count,
     };
+
     pthread_mutex_init(&shared_results.mutex, NULL);
 
     pthread_t sniffer_tid;
@@ -32,6 +33,9 @@ int main(int argc, char **argv) {
     start_thread_pool(&queue, config.speedup);
 
     pthread_join(sniffer_tid, NULL);
+
+    // Add "Filtered" status for jobs with no reply
+    finalize_unanswered_jobs(&queue, &shared_results);
 
     print_results(&shared_results);
 
