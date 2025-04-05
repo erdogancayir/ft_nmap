@@ -1,44 +1,67 @@
 #include "job_queue.h"
 #include "tcp.h"
 #include "udp.h"
-#include <netinet/tcp.h> // For TH_SYN, TH_FIN, TH_ACK, etc.
+#include <netinet/tcp.h>
 #include "ft_nmap.h"
 
+/**
+ * Worker thread function that continuously pulls scan jobs from the queue
+ * and sends the appropriate probe (TCP or UDP) to the target.
+ *
+ * Each worker:
+ * - Dequeues a job
+ * - Sends the scan packet based on the scan type
+ * - Logs the action
+ *
+ * If the queue is empty and marked as done, the thread exits gracefully.
+ *
+ * @param arg Pointer to the shared job queue (cast from void*)
+ * @return NULL (thread exit)
+ */
 void *worker_thread(void *arg) {
     t_job_queue *q = (t_job_queue *)arg;
     t_scan_job job;
 
-    char *my_ip = q->my_ip;
-    if (!my_ip || strlen(my_ip) == 0) {
+    // Ensure source IP is set before sending packets
+    if (!q->my_ip || strlen(q->my_ip) == 0) {
         fprintf(stderr, "Error: source IP is not defined!\n");
         pthread_exit(NULL);
     }
 
+    // Continuously fetch and execute jobs from the queue
     while (dequeue_job(q, &job)) {
         switch (job.type) {
             case SCAN_SYN:
-                send_tcp_packet(my_ip, job.target_ip, job.src_port, job.target_port, TH_SYN);
+                // Send TCP packet with SYN flag for SYN scan
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_SYN);
                 break;
             case SCAN_NULL:
-                send_tcp_packet(my_ip, job.target_ip, job.src_port, job.target_port, 0x00);
+                // Send TCP packet with no flags for NULL scan
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, 0x00);
                 break;
             case SCAN_FIN:
-                send_tcp_packet(my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN);
+                // Send TCP packet with FIN flag for FIN scan
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN);
                 break;
             case SCAN_XMAS:
-                send_tcp_packet(my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN | TH_PUSH | TH_URG);
+                // Send TCP packet with FIN, PUSH, URG flags for XMAS scan
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN | TH_PUSH | TH_URG);
                 break;
             case SCAN_ACK:
-                send_tcp_packet(my_ip, job.target_ip, job.src_port, job.target_port, TH_ACK);
+                // Send TCP packet with ACK flag for ACK scan
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_ACK);
                 break;
             case SCAN_UDP:
-                send_udp_packet(my_ip, job.target_ip, job.src_port, job.target_port);
+                // Send raw UDP packet for UDP scan
+                send_udp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port);
                 break;
         }
 
+        // Print formatted output for each sent scan attempt
         print_sent_message(job.target_ip, job.target_port, scan_type_to_str(job.type));
 
-        usleep(1000);
+        // Slight delay between jobs to prevent flooding the network
+        usleep(1000);  // Sleep 1 millisecond
     }
 
     return NULL;

@@ -10,15 +10,13 @@
 void print_results(t_shared_results *results) {
     printf("\n==================== Scan Results ====================\n");
 
-    // To prevent concurrent modification
     pthread_mutex_lock(&results->mutex);
-
-    t_scan_result *cur = results->head;
 
     printf("\nOpen Ports:\n");
     printf("Port  Service        Scan-Type         Status\n");
     printf("-----------------------------------------------------\n");
 
+    t_scan_result *cur = results->head;
     while (cur) {
         if (strcmp(cur->status, "Open") == 0 || strcmp(cur->status, "Open|Filtered") == 0) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
@@ -28,12 +26,11 @@ void print_results(t_shared_results *results) {
         cur = cur->next;
     }
 
-    cur = results->head;
-
     printf("\nClosed/Filtered/Unfiltered Ports:\n");
     printf("Port  Service        Scan-Type         Status\n");
     printf("-----------------------------------------------------\n");
 
+    cur = results->head;
     while (cur) {
         if (strcmp(cur->status, "Open") != 0 && strcmp(cur->status, "Open|Filtered") != 0) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");

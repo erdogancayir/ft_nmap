@@ -16,6 +16,8 @@
 #define PORT_SCAN_BASE 40000
 #define SCAN_TYPE_OFFSET 1000
 
+// Timeout threshold for sniffer (in milliseconds)
+#define SNIFFER_TIMEOUT_MS 3000
 
 #ifndef DEBUG
     #define DEBUG_PRINT(...) do { if (0) fprintf(stderr, __VA_ARGS__); } while (0)
