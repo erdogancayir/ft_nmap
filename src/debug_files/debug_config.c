@@ -11,23 +11,23 @@
 #define CLR_RESET   "\x1b[0m"
 
 void print_config(t_scan_config *config) {
-    printf("\n🔍 " CLR_CYAN "Config Ayarları:" CLR_RESET "\n");
-    printf("  Interface: " CLR_YELLOW "%s\n" CLR_RESET, config->my_interface);
-    printf("  IP:        " CLR_GREEN "%s\n" CLR_RESET, config->ip ? config->ip : "None");
-    printf("  IP File:   " CLR_GREEN "%s\n" CLR_RESET, config->ip_file ? config->ip_file : "None");
+    DEBUG_PRINT("\n🔍 " CLR_CYAN "Config Ayarları:" CLR_RESET "\n");
+    DEBUG_PRINT("  Interface: " CLR_YELLOW "%s\n" CLR_RESET, config->my_interface);
+    DEBUG_PRINT("  IP:        " CLR_GREEN "%s\n" CLR_RESET, config->ip ? config->ip : "None");
+    DEBUG_PRINT("  IP File:   " CLR_GREEN "%s\n" CLR_RESET, config->ip_file ? config->ip_file : "None");
 
-    printf("  Ports:     ");
+    DEBUG_PRINT("  Ports:     ");
     for (int i = 0; i < config->port_count && i < 10; i++)
-        printf(CLR_MAGENTA "%d%s" CLR_RESET, config->ports[i], (i < config->port_count - 1 ? ", " : ""));
+    DEBUG_PRINT(CLR_MAGENTA "%d%s" CLR_RESET, config->ports[i], (i < config->port_count - 1 ? ", " : ""));
     if (config->port_count > 10) printf("... (+%d more)\n", config->port_count - 10);
-    else printf("\n");
+    else DEBUG_PRINT("\n");
 
-    printf("  Scan Types:");
+    DEBUG_PRINT("  Scan Types:");
     for (int i = 0; i < config->scan_count; i++) {
-        printf(" " CLR_BLUE "%s" CLR_RESET, scan_type_to_str(config->scan_types[i]));
+        DEBUG_PRINT(" " CLR_BLUE "%s" CLR_RESET, scan_type_to_str(config->scan_types[i]));
     }
-    printf("\n");
+    DEBUG_PRINT("\n");
 
-    printf("  Speedup:   " CLR_YELLOW "%d\n" CLR_RESET, config->speedup);
-    printf("  Show Help: " CLR_YELLOW "%s\n\n" CLR_RESET, config->show_help ? "true" : "false");
+    DEBUG_PRINT("  Speedup:   " CLR_YELLOW "%d\n" CLR_RESET, config->speedup);
+    DEBUG_PRINT("  Show Help: " CLR_YELLOW "%s\n\n" CLR_RESET, config->show_help ? "true" : "false");
 }
