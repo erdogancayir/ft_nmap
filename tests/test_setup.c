@@ -11,6 +11,9 @@ int main() {
     printf("🧪 Running test_case_custom...\n");
     test_add_scan_result();
 
+    printf("🧪 Running job queue tests...\n");
+    test_job_queue();
+
     printf("✅ All tests completed!\n");
     return 0;
 }
