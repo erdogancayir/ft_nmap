@@ -26,6 +26,6 @@ typedef struct {
 
 
 void parse_args(int argc, char **argv, t_scan_config *config);
-void DEBUG_CONFIG(const t_scan_config *config);
+void print_config(t_scan_config *config);
 
 #endif

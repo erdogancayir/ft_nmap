@@ -123,48 +123,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     if (config->speedup > 250)
         config->speedup = 250;
 
-    DEBUG_CONFIG(config);
+    print_config(config);
 
     if (config->show_help)
         print_help();
-}
-
-
-void DEBUG_CONFIG(const t_scan_config *config) {
-    DEBUG_PRINT("🔍 Config Ayarları:\n");
-    DEBUG_PRINT("  Interface: %s\n", config->my_interface ? config->my_interface : "None");
-    DEBUG_PRINT("  IP: %s\n", config->ip ? config->ip : "None");
-    DEBUG_PRINT("  IP File: %s\n", config->ip_file ? config->ip_file : "None");
-
-    DEBUG_PRINT("  Ports: ");
-    for (int i = 0; i < config->port_count; i++) {
-        DEBUG_PRINT("%d", config->ports[i]);
-        if (i < config->port_count - 1)
-            DEBUG_PRINT(", ");
-    }
-    DEBUG_PRINT("\n");
-
-    DEBUG_PRINT("  Scan Types: ");
-    for (int i = 0; i < config->scan_count; i++) {
-        const char *type_str = NULL;
-
-        switch (config->scan_types[i]) {
-            case SCAN_SYN: type_str = "SYN"; break;
-            case SCAN_NULL: type_str = "NULL"; break;
-            case SCAN_FIN: type_str = "FIN"; break;
-            case SCAN_XMAS: type_str = "XMAS"; break;
-            case SCAN_ACK: type_str = "ACK"; break;
-            case SCAN_UDP: type_str = "UDP"; break;
-            default: type_str = "UNKNOWN"; break;
-        }
-
-        DEBUG_PRINT("%s", type_str);
-        if (i < config->scan_count - 1)
-            DEBUG_PRINT(", ");
-    }
-    DEBUG_PRINT("\n");
-
-    DEBUG_PRINT("  Speedup: %d\n", config->speedup);
-    DEBUG_PRINT("  Show Help: %s\n", config->show_help ? "true" : "false");
-    DEBUG_PRINT("  My IP: %s\n\n", config->my_ip ? config->my_ip : "None");
 }
