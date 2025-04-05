@@ -1,6 +1,3 @@
-https://medium.com/@erdogancayir/pcap-nedir-a%C4%9F-paketlerini-yakalaman%C4%B1n-sihirli-anahtar%C4%B1-7ce4239340f6
-
-
 # 🔍 ft_nmap
 
 A lightweight network port scanner implementation in C, inspired by nmap. This project demonstrates advanced socket programming, packet crafting, and multi-threaded network scanning techniques.
@@ -10,6 +7,11 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
 - [Installation](#installation)
 - [Usage](#usage)
 - [Architecture](#architecture)
+
+## 📚 Additional Reading
+
+For a deeper understanding of packet capture and network analysis:
+- [Understanding PCAP: The Magic Key to Network Packet Capture](https://medium.com/@erdogancayir/pcap-nedir-a%C4%9F-paketlerini-yakalaman%C4%B1n-sihirli-anahtar%C4%B1-7ce4239340f6) - A comprehensive guide to PCAP (Turkish)
 
 ## Features
 
