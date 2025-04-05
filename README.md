@@ -12,8 +12,6 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
 - [Architecture](#architecture)
 
 ## Features
-<details>
-<summary>Click to expand</summary>
 
 - **Multiple Scan Types**
   - TCP SYN scan (half-open)
@@ -48,7 +46,103 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
 ### UDP Scan
 - Sends UDP packet
 - Detects ICMP port unreachable messages
-</details>
+
+## Architecture
+
+### Core Components
+1. **Job Queue System**
+   - Thread-safe task distribution
+   - Dynamic job allocation
+   - Producer-consumer pattern
+
+2. **Packet Capture**
+   - Real-time packet monitoring
+   - libpcap integration
+   - Thread-safe result processing
+
+3. **Scanning Engine**
+   - Multi-threaded port scanning
+   - Custom packet crafting
+   - Result aggregation
+
+### Threading Model
+- Main thread: Job distribution and result collection
+- Worker threads: Port scanning
+- Sniffer thread: Packet capture
+
+### Job Queue System
+
+The Job Queue is a central component that manages the distribution of scanning tasks across multiple threads. It implements a producer-consumer pattern to ensure efficient and thread-safe task distribution.
+
+#### How It Works
+
+1. **Job Creation**
+   - Main thread creates jobs based on:
+     - Port ranges (e.g., 70-90)
+     - Scan types (e.g., SYN, UDP)
+     - Target IP addresses
+
+2. **Job Structure**
+```c
+typedef struct s_job {
+    uint16_t port;           // Port to scan
+    uint8_t scan_type;       // Type of scan (SYN, NULL, etc.)
+    char *target_ip;         // Target IP address
+    struct s_job *next;      // Next job in queue
+} t_job;
+```
+
+#### Visual Representation
+
+```mermaid
+graph TD
+    A[Main Thread] -->|Creates Jobs| B[Job Queue]
+    B -->|Distributes| C[Worker Thread 1]
+    B -->|Distributes| D[Worker Thread 2]
+    B -->|Distributes| E[Worker Thread N]
+    C -->|Results| F[Shared Results]
+    D -->|Results| F
+    E -->|Results| F
+    G[Sniffer Thread] -->|Packet Data| F
+```
+
+#### Example Job Matrix
+
+For a scan with:
+- Ports: 80, 443
+- Scan Types: SYN, UDP
+- Target IP: 192.168.1.1
+
+The job queue will contain:
+
+| Job ID | Port | Scan Type | Target IP    |
+|--------|------|-----------|--------------|
+| 1      | 80   | SYN       | 192.168.1.1 |
+| 2      | 80   | UDP       | 192.168.1.1 |
+| 3      | 443  | SYN       | 192.168.1.1 |
+| 4      | 443  | UDP       | 192.168.1.1 |
+
+#### Benefits
+
+1. **Efficiency**
+   - Dynamic job distribution
+   - No idle threads
+   - Optimal resource utilization
+
+2. **Thread Safety**
+   - Mutex-protected queue access
+   - Condition variables for synchronization
+   - No race conditions
+
+3. **Scalability**
+   - Easy to add more worker threads
+   - Automatic load balancing
+   - Configurable thread count
+
+4. **Reliability**
+   - No job duplication
+   - No missed jobs
+   - Graceful error handling
 
 ## Technical Deep Dive
 <details>
@@ -247,106 +341,6 @@ This section provides a detailed technical explanation of how ft_nmap implements
    ```
 
 This technical deep dive provides implementation details and best practices for developers building similar low-level port scanners. The examples demonstrate proper handling of various response types, resource management, and performance optimization techniques.
-</details>
-
-## Architecture
-<details>
-<summary>Click to expand</summary>
-
-### Core Components
-1. **Job Queue System**
-   - Thread-safe task distribution
-   - Dynamic job allocation
-   - Producer-consumer pattern
-
-2. **Packet Capture**
-   - Real-time packet monitoring
-   - libpcap integration
-   - Thread-safe result processing
-
-3. **Scanning Engine**
-   - Multi-threaded port scanning
-   - Custom packet crafting
-   - Result aggregation
-
-### Threading Model
-- Main thread: Job distribution and result collection
-- Worker threads: Port scanning
-- Sniffer thread: Packet capture
-
-### Job Queue System
-
-The Job Queue is a central component that manages the distribution of scanning tasks across multiple threads. It implements a producer-consumer pattern to ensure efficient and thread-safe task distribution.
-
-#### How It Works
-
-1. **Job Creation**
-   - Main thread creates jobs based on:
-     - Port ranges (e.g., 70-90)
-     - Scan types (e.g., SYN, UDP)
-     - Target IP addresses
-
-2. **Job Structure**
-```c
-typedef struct s_job {
-    uint16_t port;           // Port to scan
-    uint8_t scan_type;       // Type of scan (SYN, NULL, etc.)
-    char *target_ip;         // Target IP address
-    struct s_job *next;      // Next job in queue
-} t_job;
-```
-
-#### Visual Representation
-
-```mermaid
-graph TD
-    A[Main Thread] -->|Creates Jobs| B[Job Queue]
-    B -->|Distributes| C[Worker Thread 1]
-    B -->|Distributes| D[Worker Thread 2]
-    B -->|Distributes| E[Worker Thread N]
-    C -->|Results| F[Shared Results]
-    D -->|Results| F
-    E -->|Results| F
-    G[Sniffer Thread] -->|Packet Data| F
-```
-
-#### Example Job Matrix
-
-For a scan with:
-- Ports: 80, 443
-- Scan Types: SYN, UDP
-- Target IP: 192.168.1.1
-
-The job queue will contain:
-
-| Job ID | Port | Scan Type | Target IP    |
-|--------|------|-----------|--------------|
-| 1      | 80   | SYN       | 192.168.1.1 |
-| 2      | 80   | UDP       | 192.168.1.1 |
-| 3      | 443  | SYN       | 192.168.1.1 |
-| 4      | 443  | UDP       | 192.168.1.1 |
-
-#### Benefits
-
-1. **Efficiency**
-   - Dynamic job distribution
-   - No idle threads
-   - Optimal resource utilization
-
-2. **Thread Safety**
-   - Mutex-protected queue access
-   - Condition variables for synchronization
-   - No race conditions
-
-3. **Scalability**
-   - Easy to add more worker threads
-   - Automatic load balancing
-   - Configurable thread count
-
-4. **Reliability**
-   - No job duplication
-   - No missed jobs
-   - Graceful error handling
 </details>
 
 ### Installing Dependencies
