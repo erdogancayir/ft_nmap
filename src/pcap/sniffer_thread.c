@@ -61,6 +61,11 @@ void *sniffer_thread(void *arg) {
         // Dispatch packets to the handler; -1 = process all in buffer
         int ret = pcap_dispatch(handle, -1, packet_handler, (unsigned char *)results);
 
+        if (results->response_count == results->job_count) {
+            DEBUG_PRINT("✅ All responses received, exiting sniffer thread\n");
+            break;
+        }
+
         if (ret == -1) {
             // Error during dispatch
             fprintf(stderr, "pcap_dispatch error!\n");
