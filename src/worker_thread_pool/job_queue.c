@@ -38,7 +38,6 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job) {
     while (q->head == q->tail) {
         if (q->done) {
             pthread_mutex_unlock(&q->mutex);
-            DEBUG_PRINT("Queue is done and empty, exiting...\n");
             return false;
         }
         pthread_cond_wait(&q->cond, &q->mutex); // Bekle ama done değişirse uyan

@@ -9,6 +9,7 @@
         "ft_nmap.h": "c",
         "tcp.h": "c",
         "string.h": "c",
-        "ip.h": "c"
+        "ip.h": "c",
+        "job_queue.h": "c"
     }
 }
