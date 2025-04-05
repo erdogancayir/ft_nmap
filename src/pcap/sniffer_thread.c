@@ -14,7 +14,7 @@ void *sniffer_thread(void *arg) {
     pcap_t *handle;
 
     const char *dev = results->interface;
-    handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
+    handle = pcap_open_live(dev, BUFSIZ, 1, 100, errbuf);
     if (!handle) {
         fprintf(stderr, "pcap_open_live() failed: %s\n", errbuf);
         pthread_exit(NULL);
