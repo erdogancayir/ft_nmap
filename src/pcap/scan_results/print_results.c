@@ -7,8 +7,9 @@
 #include <pthread.h>
 #include "scan_type.h"
 
-void print_results(t_shared_results *results) {
+void print_results(t_shared_results *results, double duration) {
     printf("\n==================== Scan Results ====================\n");
+    printf("⏱ Scan took %.3f secs\n", duration);
 
     pthread_mutex_lock(&results->mutex);
 

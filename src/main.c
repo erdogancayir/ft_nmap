@@ -35,6 +35,9 @@ int main(int argc, char **argv) {
 
     shared_results->ip_count = config.ip_count;
 
+    struct timespec start_time, end_time;
+    clock_gettime(CLOCK_MONOTONIC, &start_time);  // ⏱ start time
+
     pthread_t sniffer_tid;
     pthread_create(&sniffer_tid, NULL, sniffer_thread, (void *)shared_results);
 
@@ -45,7 +48,12 @@ int main(int argc, char **argv) {
     // Add "Filtered" status for jobs with no reply
     finalize_unanswered_jobs(&queue, shared_results);
 
-    print_results(shared_results);
+    clock_gettime(CLOCK_MONOTONIC, &end_time); // ⏱ Finish time
+    double duration = (end_time.tv_sec - start_time.tv_sec)
+                    + (end_time.tv_nsec - start_time.tv_nsec) / 1e9;
+
+
+    print_results(shared_results, duration);
 
     free_config(&config);
     return 0;
