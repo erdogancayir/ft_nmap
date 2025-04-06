@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
 
     t_shared_results *shared_results = malloc(sizeof(t_shared_results) * config.ip_count);
     if (!shared_results) {
+        free_config(&config);
         perror("malloc failed for shared_results");
         exit(EXIT_FAILURE);
     }
@@ -51,7 +52,6 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &end_time); // ⏱ Finish time
     double duration = (end_time.tv_sec - start_time.tv_sec)
                     + (end_time.tv_nsec - start_time.tv_nsec) / 1e9;
-
 
     print_results(shared_results, duration);
 
