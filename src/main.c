@@ -47,5 +47,6 @@ int main(int argc, char **argv) {
 
     print_results(shared_results);
 
+    free_config(&config);
     return 0;
 }

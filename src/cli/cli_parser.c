@@ -12,7 +12,14 @@
 #define MAX_IPS 1024
 #define MAX_LINE_LENGTH 256
 
-// Yardım ekranı
+void clean_exit(t_scan_config *config, const char *message) {
+    if (message)
+        fprintf(stderr, "%s\n", message);
+
+    free_config(config);
+    exit(EXIT_FAILURE);
+}
+
 void print_help() {
     printf("Usage: ./ft_nmap [OPTIONS]\n");
     printf("  --help               Show this help message\n");
@@ -24,8 +31,8 @@ void print_help() {
     exit(0);
 }
 
-// Basit port parse (örn: 22,80,1000-1002)
-int parse_ports(const char *input, int *ports) {
+// basic port parse (örn: 22,80,1000-1002)
+int parse_ports(const char *input, int *ports, t_scan_config *config) {
     char buffer[512];
     strncpy(buffer, input, sizeof(buffer));
     buffer[sizeof(buffer)-1] = '\0';
@@ -40,16 +47,14 @@ int parse_ports(const char *input, int *ports) {
             int start = atoi(token);
             int end = atoi(dash + 1);
             if (start <= 0 || end <= 0 || start > end) {
-                fprintf(stderr, "❌ Invalid port range: %s-%s\n", token, dash + 1);
-                exit(EXIT_FAILURE);
+                clean_exit(config, "❌ Invalid port range");
             }
             for (int i = start; i <= end && count < MAX_PORTS; i++)
                 ports[count++] = i;
         } else {
             int port = atoi(token);
             if (port <= 0) {
-                fprintf(stderr, "❌ Invalid port: %s\n", token);
-                exit(EXIT_FAILURE);
+                clean_exit(config, "❌ Invalid port");
             }
             ports[count++] = port;
         }
@@ -59,7 +64,7 @@ int parse_ports(const char *input, int *ports) {
 }
 
 // Scan tiplerini parse et
-int parse_scan_types(const char *input, scan_type *scans) {
+int parse_scan_types(const char *input, scan_type *scans, t_scan_config *config) {
     char buffer[128];
     strncpy(buffer, input, sizeof(buffer));
     buffer[sizeof(buffer)-1] = '\0';
@@ -83,24 +88,21 @@ int parse_scan_types(const char *input, scan_type *scans) {
     }
 
     if (has_invalid) {
-        fprintf(stderr, "🚫 One or more scan types are invalid. Use --help for valid options.\n");
-        exit(EXIT_FAILURE);
+        clean_exit(config, "🚫 One or more scan types are invalid. Use --help for valid options.");
     }
 
     return count;
 }
 
-char **fill_multiple_ip_list(const char *filename) {
+char **fill_multiple_ip_list(const char *filename, t_scan_config *config) {
     FILE *file = fopen(filename, "r");
     if (!file) {
-        perror("File does not exist");
-        exit(EXIT_FAILURE);
+        clean_exit(config, "❌ File does not exist");
     }
 
     char **ip_list = malloc(sizeof(char *) * MAX_IPS);
     if (!ip_list) {
-        perror("Memory allocation failed");
-        exit(EXIT_FAILURE);
+        clean_exit(config, "❌ Memory allocation failed for ip_list.");
     }
 
     char line[MAX_LINE_LENGTH];
@@ -115,8 +117,7 @@ char **fill_multiple_ip_list(const char *filename) {
 
         ip_list[count] = strdup(resolve_adress(line));
         if (!ip_list[count]) {
-            perror("Memory allocation failed");
-            exit(EXIT_FAILURE);
+            clean_exit(config, "❌ Memory allocation failed for IP address.");
         }
 
         count++;
@@ -137,8 +138,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     char *my_iface = NULL;
     
     if (!find_source_ip_and_iface(&my_ip, &my_iface)) {
-        fprintf(stderr, "❌ IP and interface could not found!\n");
-        exit(EXIT_FAILURE);
+        clean_exit(config, "❌ IP and interface could not be found!");
     }
 
     config->my_ip = my_ip;
@@ -154,8 +154,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
 
             config->ip_list = malloc(2 * sizeof(char *)); // [0] = ip, [1] = NULL
             if (!config->ip_list) {
-                fprintf(stderr, "Memory allocation failed for ip_list.\n");
-                exit(EXIT_FAILURE);
+                clean_exit(config, "Memory allocation failed for ip_list.");
             }
             config->ip_list[0] = resolved_ip;
             config->ip_list[1] = NULL;
@@ -164,34 +163,30 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--file") == 0 && i+1 < argc)
         {
             both_ip_and_file++;
-            config->ip_list = fill_multiple_ip_list(argv[++i]);
+            config->ip_list = fill_multiple_ip_list(argv[++i], config);
         }
         else if (strcmp(argv[i], "--ports") == 0 && i+1 < argc)
-            config->port_count = parse_ports(argv[++i], config->ports);
+            config->port_count = parse_ports(argv[++i], config->ports, config);
         else if (strcmp(argv[i], "--scan") == 0 && i+1 < argc)
-            config->scan_count = parse_scan_types(argv[++i], config->scan_types);
+            config->scan_count = parse_scan_types(argv[++i], config->scan_types, config);
         else if (strcmp(argv[i], "--speedup") == 0 && i+1 < argc)
         {
             config->speedup = atoi(argv[++i]);
             if (config->speedup <= 0 || config->speedup > 250) {
-                fprintf(stderr, "❌ Invalid --speedup value. Must be between 1 and 250.\n");
-                exit(EXIT_FAILURE);
+                clean_exit(config, "❌ Invalid --speedup value. Must be between 1 and 250.");
             }
         }
         else {
-            fprintf(stderr, "Unknown or missing argument: %s\n", argv[i]);
-            exit(1);
+            clean_exit(config, "❌ Unknown or missing argument");
         }
     }
 
     if (both_ip_and_file == 0) {
-        fprintf(stderr, "❌ One of --ip or --file must be provided.\n");
-        exit(EXIT_FAILURE);
+        clean_exit(config, "❌ One of --ip or --file must be provided.");
     }
     
     if (both_ip_and_file == 2) {
-        fprintf(stderr, "Error: --ip or --file must be specified!\n");
-        exit(EXIT_FAILURE);
+        clean_exit(config, "❌ Only one of --ip or --file can be provided.");
     }
 
     if (config->scan_count == 0) {
