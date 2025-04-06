@@ -37,16 +37,17 @@ void *sniffer_thread(void *arg) {
     }
 
     // Prepare and apply BPF filter: only capture TCP packets from target to our IP
-    struct bpf_program fp;
-    char filter_exp[256];
-    snprintf(filter_exp, sizeof(filter_exp), "tcp and src host %s and dst host %s", results->target_ip, results->my_ip);
+    char *filter_exp = build_bpf_filter(results, results->ip_count);
 
+    struct bpf_program fp;
     if (pcap_compile(handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1 ||
         pcap_setfilter(handle, &fp) == -1) {
         fprintf(stderr, "pcap filter error: %s\n", pcap_geterr(handle));
         pcap_close(handle);
         pthread_exit(NULL);
     }
+
+    free(filter_exp);
 
     // Set non-blocking mode so pcap_dispatch() returns immediately if no packets
     if (pcap_setnonblock(handle, 1, errbuf) == -1) {
@@ -91,4 +92,30 @@ void *sniffer_thread(void *arg) {
     // Cleanup and exit
     pcap_close(handle);
     pthread_exit(NULL);
+}
+
+char *build_bpf_filter(t_shared_results *results, int ip_count) {
+    char *filter = malloc(1024);
+    if (!filter) {
+        perror("malloc failed for BPF filter");
+        exit(EXIT_FAILURE);
+    }
+
+    strcpy(filter, "tcp and (");
+
+    for (int i = 0; i < ip_count; i++) {
+        strcat(filter, "src host ");
+        strcat(filter, results[i].target_ip);
+
+        if (i < ip_count - 1) {
+            strcat(filter, " or ");
+        }
+    }
+
+    strcat(filter, ") and dst host ");
+    strcat(filter, results[0].my_ip);  // Aynı IP tüm işlerde geçerli
+
+    DEBUG_PRINT("📡 Applied BPF filter: %s\n", filter);
+
+    return filter;
 }

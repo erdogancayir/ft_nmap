@@ -14,30 +14,38 @@ int main(int argc, char **argv) {
 
     init_job_queue(&queue, config.my_ip, config);
 
-    // Shared results for pcap thread
-    t_shared_results shared_results = {
-        .head = NULL, 
-        .interface = config.my_interface, 
-        .target_ip = config.ip, 
-        .my_ip = config.my_ip,
-        .job_count = queue.tail,
-        .response_count = 0,
-        .scan_type_count = config.scan_count,
-    };
+    t_shared_results *shared_results = malloc(sizeof(t_shared_results) * config.ip_count);
+    if (!shared_results) {
+        perror("malloc failed for shared_results");
+        exit(EXIT_FAILURE);
+    }
 
-    pthread_mutex_init(&shared_results.mutex, NULL);
+    for (int i = 0; i < config.ip_count; i++) {
+        t_shared_results *result = &shared_results[i];
+
+        result->head = NULL;
+        result->interface = config.my_interface;
+        result->target_ip = config.ip_list[i];
+        result->my_ip = config.my_ip;
+        result->response_count = 0;
+        result->scan_type_count = config.scan_count;
+        result->job_count = queue.tail;
+        pthread_mutex_init(&result->mutex, NULL);
+    }
+
+    shared_results->ip_count = config.ip_count;
 
     pthread_t sniffer_tid;
-    pthread_create(&sniffer_tid, NULL, sniffer_thread, (void *)&shared_results);
+    pthread_create(&sniffer_tid, NULL, sniffer_thread, (void *)shared_results);
 
     start_thread_pool(&queue, config.speedup);
 
     pthread_join(sniffer_tid, NULL);
 
     // Add "Filtered" status for jobs with no reply
-    finalize_unanswered_jobs(&queue, &shared_results);
+    finalize_unanswered_jobs(&queue, shared_results);
 
-    print_results(&shared_results);
+    print_results(shared_results);
 
     return 0;
 }

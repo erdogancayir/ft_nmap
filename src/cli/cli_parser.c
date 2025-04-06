@@ -65,6 +65,53 @@ int parse_scan_types(const char *input, scan_type *scans) {
     return count;
 }
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_IPS 1024
+#define MAX_LINE_LENGTH 256
+
+char **fill_multiple_ip_list(const char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (!file) {
+        perror("File does not exist");
+        exit(EXIT_FAILURE);
+    }
+
+    char **ip_list = malloc(sizeof(char *) * MAX_IPS);
+    if (!ip_list) {
+        perror("Memory allocation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    char line[MAX_LINE_LENGTH];
+    int count = 0;
+
+    while (fgets(line, sizeof(line), file) && count < MAX_IPS) {
+        // Satır sonundaki newline karakterini temizle
+        line[strcspn(line, "\r\n")] = 0;
+
+        if (strlen(line) == 0)
+            continue;
+
+        ip_list[count] = strdup(resolve_adress(line));
+        if (!ip_list[count]) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+
+        count++;
+    }
+
+    fclose(file);
+
+    // Null-terminate diziyi (istersen)
+    ip_list[count] = NULL;
+
+    return ip_list;
+}
+
 void parse_args(int argc, char **argv, t_scan_config *config) {
     memset(config, 0, sizeof(*config));
 
@@ -72,20 +119,37 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     char *my_iface = NULL;
     
     if (!find_source_ip_and_iface(&my_ip, &my_iface)) {
-        fprintf(stderr, "❌ IP ve interface bulunamadı!\n");
+        fprintf(stderr, "❌ IP and interface could not found!\n");
         exit(EXIT_FAILURE);
     }
 
     config->my_ip = my_ip;
     config->my_interface = my_iface;
+    int both_ip_and_file = 0;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0)
             config->show_help = true;
         else if (strcmp(argv[i], "--ip") == 0 && i+1 < argc)
-            config->ip = resolve_adress(argv[++i]);
+        {
+            char *resolved_ip = resolve_adress(argv[++i]);
+            config->ip_count = 1;
+
+            // Tek elemanlı ip_list oluştur
+            config->ip_list = malloc(2 * sizeof(char *)); // [0] = ip, [1] = NULL
+            if (!config->ip_list) {
+                fprintf(stderr, "Memory allocation failed for ip_list.\n");
+                exit(EXIT_FAILURE);
+            }
+            config->ip_list[0] = resolved_ip;
+            config->ip_list[1] = NULL;
+            both_ip_and_file++;
+        }
         else if (strcmp(argv[i], "--file") == 0 && i+1 < argc)
-            config->ip_file = argv[++i];
+        {
+            both_ip_and_file++;
+            config->ip_list = fill_multiple_ip_list(argv[++i]);
+        }
         else if (strcmp(argv[i], "--ports") == 0 && i+1 < argc)
             config->port_count = parse_ports(argv[++i], config->ports);
         else if (strcmp(argv[i], "--scan") == 0 && i+1 < argc)
@@ -93,7 +157,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--speedup") == 0 && i+1 < argc)
             config->speedup = atoi(argv[++i]);
         else {
-            fprintf(stderr, "Bilinmeyen veya eksik argüman: %s\n", argv[i]);
+            fprintf(stderr, "Unknown or missing argument: %s\n", argv[i]);
             exit(1);
         }
     }
@@ -113,8 +177,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
             config->ports[config->port_count++] = i;
     }
     
-    if (!config->ip && !config->ip_file) {
-        fprintf(stderr, "Hata: --ip veya --file belirtilmeli!\n");
+    if (both_ip_and_file == 2) {
+        fprintf(stderr, "Error: --ip or --file must be specified!\n");
         exit(EXIT_FAILURE);
     }
 
@@ -122,6 +186,13 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         config->speedup = 1;
     if (config->speedup > 250)
         config->speedup = 250;
+
+
+    if (config->ip_list) {
+        for (int i = 0; config->ip_list[i] != NULL; i++) {
+            config->ip_count++;
+        }
+    }
 
     print_config(config);
 

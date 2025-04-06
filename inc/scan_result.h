@@ -27,6 +27,7 @@ typedef struct s_shared_results {
     char *my_ip;
     int job_count;
     int scan_type_count;
+    int ip_count;
 
     int response_count;
 } t_shared_results;

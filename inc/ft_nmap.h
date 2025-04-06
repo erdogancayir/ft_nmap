@@ -47,5 +47,7 @@ void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results
 int extract_scan_type_from_dst_port(int dst_port, int scan_type_count);
 
 void finalize_unanswered_jobs(t_job_queue *queue, t_shared_results *results);
+char *build_bpf_filter(t_shared_results *results, int ip_count);
+
 
 #endif

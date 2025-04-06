@@ -13,8 +13,19 @@
 void print_config(t_scan_config *config) {
     printf("\n🔍 " CLR_CYAN "Scan Configurations:" CLR_RESET "\n");
     printf("  Interface: " CLR_YELLOW "%s\n" CLR_RESET, config->my_interface);
-    printf("  IP:        " CLR_GREEN "%s\n" CLR_RESET, config->ip ? config->ip : "None");
-    printf("  IP File:   " CLR_GREEN "%s\n" CLR_RESET, config->ip_file ? config->ip_file : "None");
+    
+    if (config->ip_list && config->ip_count) {
+        printf("  IP  Targets:   ");
+        for (int i = 0; i < config->ip_count && i < 5; i++) {
+            printf(CLR_GREEN "%s%s" CLR_RESET, config->ip_list[i], (i < config->ip_count - 1 ? ", " : ""));
+        }
+        if (config->ip_count > 5)
+            printf("... (+%d more)\n", config->ip_count - 5);
+        else
+            printf("\n");
+    } else {
+        printf("  IP:        " CLR_RED "None\n" CLR_RESET);
+    }
 
     printf("  Ports:     ");
     for (int i = 0; i < config->port_count && i < 10; i++)

@@ -23,17 +23,22 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
 
     int job_index = 0;
 
-    // Enqueue a job for each (port, scan_type) combination
-    for (int i = 0; i < config.port_count; i++) {
-        for (int j = 0; j < config.scan_count; j++) {
-            t_scan_job job;
-            job.target_ip = config.ip;
-            job.target_port = config.ports[i];
-            job.src_port = PORT_SCAN_BASE + (i * config.scan_count + j);  // Unique src port per job
-            job.type = config.scan_types[j];
+    // Loop through each target IP in the list
+    for (int ip_idx = 0; ip_idx < config.ip_count; ip_idx++) {
+        char *target_ip = config.ip_list[ip_idx];
 
-            enqueue_job(q, job); // Add job to the queue
-            print_job_debug(&job, job_index++); // Debug print (optional)
+        // Enqueue a job for each (target_ip, port, scan_type) combination
+        for (int i = 0; i < config.port_count; i++) {
+            for (int j = 0; j < config.scan_count; j++) {
+                t_scan_job job;
+                job.target_ip = target_ip;
+                job.target_port = config.ports[i];
+                job.src_port = PORT_SCAN_BASE + (job_index);  // Unique src port per job
+                job.type = config.scan_types[j];
+
+                enqueue_job(q, job);                     // Add job to the queue
+                print_job_debug(&job, job_index++);      // Debug print
+            }
         }
     }
 }
