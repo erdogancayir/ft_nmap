@@ -40,7 +40,7 @@ int parse_ports(const char *input, int *ports, t_scan_config *config) {
     char *token = strtok(buffer, ",");
     int count = 0;
 
-    while (token && count < MAX_PORTS) {
+    while (token) {
         char *dash = strchr(token, '-');
         if (dash) {
             *dash = '\0';
@@ -49,17 +49,25 @@ int parse_ports(const char *input, int *ports, t_scan_config *config) {
             if (start <= 0 || end <= 0 || start > end) {
                 clean_exit(config, "❌ Invalid port range");
             }
-            for (int i = start; i <= end && count < MAX_PORTS; i++)
+            for (int i = start; i <= end; i++) {
+                if (count >= MAX_PORTS) {
+                    clean_exit(config, "❌ Too many ports. Maximum is 1024.");
+                }
                 ports[count++] = i;
+            }
         } else {
             int port = atoi(token);
             if (port <= 0) {
                 clean_exit(config, "❌ Invalid port");
             }
+            if (count >= MAX_PORTS) {
+                clean_exit(config, "❌ Too many ports. Maximum is 1024.");
+            }
             ports[count++] = port;
         }
         token = strtok(NULL, ",");
     }
+
     return count;
 }
 
