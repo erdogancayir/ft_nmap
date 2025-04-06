@@ -18,7 +18,6 @@ typedef struct {
     scan_type scan_types[MAX_SCAN_TYPES];
     int scan_count;
     int speedup;
-    bool show_help;
     char *my_ip;
     char *my_interface;
     int ip_count;

@@ -22,6 +22,8 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     q->my_ip = my_ip;
 
     int job_index = 0;
+	int total_jobs = config.ip_count * config.port_count * config.scan_count;
+	q->jobs = malloc(sizeof(t_scan_job) * total_jobs);
 
     // Loop through each target IP in the list
     for (int ip_idx = 0; ip_idx < config.ip_count; ip_idx++) {
@@ -93,4 +95,10 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job) {
     pthread_mutex_unlock(&q->mutex);
 
     return true;
+}
+
+void free_job_queue(t_job_queue *q) {
+	free(q->jobs);
+	pthread_mutex_destroy(&q->mutex);
+	pthread_cond_destroy(&q->cond);
 }

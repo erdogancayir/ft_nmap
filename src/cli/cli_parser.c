@@ -154,8 +154,10 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     int both_ip_and_file = 0;
 
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "--help") == 0)
-            config->show_help = true;
+        if (strcmp(argv[i], "--help") == 0) {
+			print_help();
+			clean_exit(config, NULL);
+		}
         else if (strcmp(argv[i], "--ip") == 0 && i+1 < argc)
         {
             char *resolved_ip = resolve_adress(argv[++i]);
@@ -220,7 +222,4 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     }
 
     print_config(config);
-
-    if (config->show_help)
-        print_help();
 }

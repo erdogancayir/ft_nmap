@@ -40,5 +40,4 @@ void print_config(t_scan_config *config) {
     printf("\n");
 
     printf("  Speedup:   " CLR_YELLOW "%d\n" CLR_RESET, config->speedup);
-    printf("  Show Help: " CLR_YELLOW "%s\n\n" CLR_RESET, config->show_help ? "true" : "false");
 }

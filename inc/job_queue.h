@@ -31,7 +31,7 @@ typedef struct {
 
 typedef struct {
     char *my_ip;
-    t_scan_job jobs[MAX_QUEUE];
+    t_scan_job *jobs;
     int head;
     int tail;
     pthread_mutex_t mutex;
@@ -50,5 +50,6 @@ void start_thread_pool(t_job_queue *q, int count);
 void *worker_thread(void *arg);
 
 void print_job_debug(const t_scan_job *job, int index);
+void free_job_queue(t_job_queue *q);
 
 #endif
