@@ -13,11 +13,11 @@
 #define MAX_LINE_LENGTH 256
 
 void clean_exit(t_scan_config *config, const char *message) {
-    if (message)
+    if (message) {
         fprintf(stderr, "%s\n", message);
-
-    free_config(config);
-    exit(EXIT_FAILURE);
+	}
+	free_config(config);
+	exit(EXIT_FAILURE);
 }
 
 void print_help() {
@@ -168,7 +168,11 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
             }
             config->ip_list[0] = resolved_ip;
             config->ip_list[1] = NULL;
-            both_ip_and_file++;
+			if (!is_valid_ip(resolved_ip))
+			{
+				clean_exit(config, "❌ Invalid IP address");
+			}
+			both_ip_and_file++;
         }
         else if (strcmp(argv[i], "--file") == 0 && i+1 < argc)
         {
@@ -222,4 +226,12 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     }
 
     print_config(config);
+}
+
+bool is_valid_ip(const char *ip) {
+	if (ip == NULL) {
+		return false;
+	}
+    struct sockaddr_in sa;
+    return inet_pton(AF_INET, ip, &(sa.sin_addr)) == 1;
 }

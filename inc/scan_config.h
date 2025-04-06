@@ -25,6 +25,7 @@ typedef struct {
 
 
 void parse_args(int argc, char **argv, t_scan_config *config);
+bool is_valid_ip(const char *ip);
 void print_config(t_scan_config *config);
 
 void free_config(t_scan_config *config);
