@@ -5,6 +5,13 @@
 #include "scan_config.h"
 #include "ft_nmap.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_IPS 1024
+#define MAX_LINE_LENGTH 256
+
 // Yardım ekranı
 void print_help() {
     printf("Usage: ./ft_nmap [OPTIONS]\n");
@@ -32,10 +39,19 @@ int parse_ports(const char *input, int *ports) {
             *dash = '\0';
             int start = atoi(token);
             int end = atoi(dash + 1);
+            if (start <= 0 || end <= 0 || start > end) {
+                fprintf(stderr, "❌ Invalid port range: %s-%s\n", token, dash + 1);
+                exit(EXIT_FAILURE);
+            }
             for (int i = start; i <= end && count < MAX_PORTS; i++)
                 ports[count++] = i;
         } else {
-            ports[count++] = atoi(token);
+            int port = atoi(token);
+            if (port <= 0) {
+                fprintf(stderr, "❌ Invalid port: %s\n", token);
+                exit(EXIT_FAILURE);
+            }
+            ports[count++] = port;
         }
         token = strtok(NULL, ",");
     }
@@ -50,6 +66,7 @@ int parse_scan_types(const char *input, scan_type *scans) {
 
     char *token = strtok(buffer, ",");
     int count = 0;
+    bool has_invalid = false;
 
     while (token && count < MAX_SCAN_TYPES) {
         if (strcmp(token, "SYN") == 0) scans[count++] = SCAN_SYN;
@@ -58,19 +75,20 @@ int parse_scan_types(const char *input, scan_type *scans) {
         else if (strcmp(token, "XMAS") == 0) scans[count++] = SCAN_XMAS;
         else if (strcmp(token, "ACK") == 0) scans[count++] = SCAN_ACK;
         else if (strcmp(token, "UDP") == 0) scans[count++] = SCAN_UDP;
-        else printf("Uyarı: geçersiz scan tipi: %s\n", token);
+        else {
+            fprintf(stderr, "❌ Invalid scan type: %s\n", token);
+            has_invalid = true;
+        }
         token = strtok(NULL, ",");
+    }
+
+    if (has_invalid) {
+        fprintf(stderr, "🚫 One or more scan types are invalid. Use --help for valid options.\n");
+        exit(EXIT_FAILURE);
     }
 
     return count;
 }
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define MAX_IPS 1024
-#define MAX_LINE_LENGTH 256
 
 char **fill_multiple_ip_list(const char *filename) {
     FILE *file = fopen(filename, "r");
@@ -155,26 +173,22 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--scan") == 0 && i+1 < argc)
             config->scan_count = parse_scan_types(argv[++i], config->scan_types);
         else if (strcmp(argv[i], "--speedup") == 0 && i+1 < argc)
+        {
             config->speedup = atoi(argv[++i]);
+            if (config->speedup <= 0 || config->speedup > 250) {
+                fprintf(stderr, "❌ Invalid --speedup value. Must be between 1 and 250.\n");
+                exit(EXIT_FAILURE);
+            }
+        }
         else {
             fprintf(stderr, "Unknown or missing argument: %s\n", argv[i]);
             exit(1);
         }
     }
 
-    if (config->scan_count == 0) {
-        config->scan_types[0] = SCAN_SYN;
-        config->scan_types[1] = SCAN_NULL;
-        config->scan_types[2] = SCAN_FIN;
-        config->scan_types[3] = SCAN_XMAS;
-        config->scan_types[4] = SCAN_ACK;
-        config->scan_types[5] = SCAN_UDP;
-        config->scan_count = 6;
-    }
-
-    if (config->port_count == 0) {
-        for (int i = 1; i <= 1024; i++)
-            config->ports[config->port_count++] = i;
+    if (both_ip_and_file == 0) {
+        fprintf(stderr, "❌ One of --ip or --file must be provided.\n");
+        exit(EXIT_FAILURE);
     }
     
     if (both_ip_and_file == 2) {
@@ -182,11 +196,21 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         exit(EXIT_FAILURE);
     }
 
+    if (config->scan_count == 0) {
+        scan_type defaults[] = { SCAN_SYN, SCAN_NULL, SCAN_FIN, SCAN_XMAS, SCAN_ACK, SCAN_UDP };
+        memcpy(config->scan_types, defaults, sizeof(defaults));
+        config->scan_count = sizeof(defaults) / sizeof(scan_type);
+    }
+
+    if (config->port_count == 0) {
+        for (int i = 1; i <= 1024; i++)
+            config->ports[config->port_count++] = i;
+    }
+
     if (config->speedup <= 0)
         config->speedup = 1;
     if (config->speedup > 250)
         config->speedup = 250;
-
 
     if (config->ip_list) {
         for (int i = 0; config->ip_list[i] != NULL; i++) {
