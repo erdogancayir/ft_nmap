@@ -7,19 +7,30 @@
 
 void test_job_queue_init() {
     t_scan_config config = {0};
+    
     config.ports[0] = 80;
     config.port_count = 1;
+
     config.scan_types[0] = SCAN_SYN;
     config.scan_count = 1;
-    
+
+    config.ip_count = 1;
+    config.ip_list = malloc(2 * sizeof(char *));
+    config.ip_list[0] = strdup("192.168.1.1");
+    config.ip_list[1] = NULL;
+
     t_job_queue queue;
-    init_job_queue(&queue, "192.168.1.1", config);
-    
+    init_job_queue(&queue, "192.168.1.100", config);  // source IP
+
     assert(queue.head == 0 && "Queue head should be initialized to 0");
     assert(queue.tail > 0 && "Queue should contain jobs after initialization");
     assert(queue.jobs != NULL && "Jobs array should be allocated");
-    
+
     printf("✅ test_job_queue_init passed\n");
+
+    // Temizlik
+    free(config.ip_list[0]);
+    free(config.ip_list);
 }
 
 void test_job_queue_operations() {

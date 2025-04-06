@@ -151,8 +151,6 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--ip") == 0 && i+1 < argc)
         {
             char *resolved_ip = resolve_adress(argv[++i]);
-            config->ip_count = 1;
-
             // Tek elemanlı ip_list oluştur
             config->ip_list = malloc(2 * sizeof(char *)); // [0] = ip, [1] = NULL
             if (!config->ip_list) {

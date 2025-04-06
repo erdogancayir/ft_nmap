@@ -18,8 +18,10 @@ void test_case_basic() {
     t_scan_config config;
     parse_args(argc, argv, &config);
 
-    // ✅ IP kontrol
-    assert(strcmp(config.ip, "192.168.1.1") == 0);
+    // ✅ IP kontrol (tekli liste halinde gelir)
+    assert(config.ip_count == 1);
+    assert(config.ip_list != NULL);
+    assert(strcmp(config.ip_list[0], "192.168.1.1") == 0);
 
     // ✅ Portlar kontrol
     assert(config.port_count == 5);
