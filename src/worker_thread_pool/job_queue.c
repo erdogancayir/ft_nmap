@@ -99,6 +99,4 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job) {
 
 void free_job_queue(t_job_queue *q) {
 	free(q->jobs);
-	pthread_mutex_destroy(&q->mutex);
-	pthread_cond_destroy(&q->cond);
 }

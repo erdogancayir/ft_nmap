@@ -1,5 +1,5 @@
 NAME = ft_nmap
-CC = gcc
+CC = gcc -g
 CFLAGS = -Wall -Wextra -Werror -Iinc -MMD -MP
 LDLIBS = -lpcap
 

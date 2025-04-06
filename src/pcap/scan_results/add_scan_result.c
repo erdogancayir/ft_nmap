@@ -20,3 +20,18 @@ void add_scan_result(t_shared_results *results, const char *ip, int port, scan_t
 
     print_scan_result_log(ip, port, scan_type, status);
 }
+
+void free_scan_result(t_scan_result *result) {
+	if (!result) {
+		return;	
+	}
+
+	t_scan_result *cur = result->next;
+	while (cur) {
+		t_scan_result *temp = cur;
+		cur = cur->next;
+		free(temp->ip);
+		free(temp->status);
+		free(temp);
+	}
+}

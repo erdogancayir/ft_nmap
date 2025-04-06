@@ -54,7 +54,9 @@ int main(int argc, char **argv) {
                     + (end_time.tv_nsec - start_time.tv_nsec) / 1e9;
 
     print_results(shared_results, duration);
-
+	free_job_queue(&queue);
     free_config(&config);
+	free_scan_result(shared_results->head);
+	free(shared_results);
     return 0;
 }

@@ -32,4 +32,6 @@ typedef struct s_shared_results {
     int response_count;
 } t_shared_results;
 
+void free_scan_result(t_scan_result *result);
+
 #endif
