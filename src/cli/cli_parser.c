@@ -107,7 +107,7 @@ char **fill_multiple_ip_list(const char *filename) {
     int count = 0;
 
     while (fgets(line, sizeof(line), file) && count < MAX_IPS) {
-        // Satır sonundaki newline karakterini temizle
+        // clean newline characters
         line[strcspn(line, "\r\n")] = 0;
 
         if (strlen(line) == 0)
@@ -151,7 +151,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--ip") == 0 && i+1 < argc)
         {
             char *resolved_ip = resolve_adress(argv[++i]);
-            // Tek elemanlı ip_list oluştur
+
             config->ip_list = malloc(2 * sizeof(char *)); // [0] = ip, [1] = NULL
             if (!config->ip_list) {
                 fprintf(stderr, "Memory allocation failed for ip_list.\n");
