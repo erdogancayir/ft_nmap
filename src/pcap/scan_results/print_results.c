@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <pthread.h>
 #include "scan_type.h"
+#include "ft_nmap.h"
 
 void print_results(t_shared_results *results, double duration) {
     printf("\n==================== Scan Results ====================\n");
@@ -22,12 +23,25 @@ void print_results(t_shared_results *results, double duration) {
         if (strcmp(cur->status, "Open") == 0 || strcmp(cur->status, "Open|Filtered") == 0) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
+
+            // Eğer versiyon bilgisi daha önce alınmamışsa burada al
+            if (!cur->version || strlen(cur->version) == 0) {
+                cur->version = grab_banner(cur->ip, cur->port);
+            }
+
             printf("%-5d %-36s %-17s %s\n",
                    cur->port,
                    service_name,
                    scan_type_to_str(cur->scan_type),
                    cur->status);
-            printf("      ↳🎯 Target Host: %s (%s)\n", cur->hostname ? cur->hostname : "N/A", cur->ip);
+
+            printf("      ↳🎯 Target Host: %s (%s)\n",
+                   cur->hostname ? cur->hostname : "N/A",
+                   cur->ip);
+
+            if (cur->version && strlen(cur->version) > 0) {
+                printf("      ↳🧩 Version Info: %s\n", cur->version);
+            }
         }
         cur = cur->next;
     }
@@ -41,12 +55,16 @@ void print_results(t_shared_results *results, double duration) {
         if (strcmp(cur->status, "Open") != 0 && strcmp(cur->status, "Open|Filtered") != 0) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
+
             printf("%-5d %-36s %-17s %s\n",
                    cur->port,
                    service_name,
                    scan_type_to_str(cur->scan_type),
                    cur->status);
-            printf("      ↳🎯 Target Host: %s (%s)\n", cur->hostname ? cur->hostname : "N/A", cur->ip);
+
+            printf("      ↳🎯 Target Host: %s (%s)\n",
+                   cur->hostname ? cur->hostname : "N/A",
+                   cur->ip);
         }
         cur = cur->next;
     }

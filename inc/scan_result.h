@@ -14,15 +14,16 @@ typedef struct s_scan_result {
     int port;
     scan_type scan_type; // SYN, NULL, vs.
     char *status;  // Open, Filtered, Closed
-    char *hostname; // Hostname if resolved
+    char *hostname;
+    char *version;
+
     struct s_scan_result *next;
 } t_scan_result;
 
 typedef struct s_shared_results {
     t_scan_result *head;
     pthread_mutex_t mutex;
-    pthread_cond_t cond;       // ✅ condition variable
-    bool sniffer_done;         // ✅ sniffer işini bitirdi mi?
+    pthread_cond_t cond;
     char *interface;
     char *target_ip;
     char *my_ip;
