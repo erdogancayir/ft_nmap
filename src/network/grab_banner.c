@@ -35,7 +35,7 @@ char *grab_banner(const char *ip, int port) {
     inet_pton(AF_INET, ip, &addr.sin_addr);         // Convert IP string to binary
 
     // Set a 2-second timeout for recv()
-    struct timeval timeout = {2, 0};
+    struct timeval timeout = {1, 0};
     setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 
     // Attempt to connect to the target IP and port
