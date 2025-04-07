@@ -44,18 +44,26 @@ void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results
     // Recover the scan type we used based on our encoded src port
     int scan_type = extract_scan_type_from_dst_port(src_port, results->scan_type_count);
 
+    // OS fingerprinting: look at TTL and window size
+    const struct ip *ip_header = (const struct ip *)(packet + ETHERNET_HDR_LEN);
+    int ttl = ip_header->ip_ttl;
+    int window = ntohs(tcp->th_win);
+
+    const char *os_guess = guess_os(ttl, window);
+
+
     // Classify result based on TCP flags
     if (flags & TH_SYN && flags & TH_ACK) {
         // SYN-ACK received → port is open (for SYN scan)
-        add_scan_result(results, src_ip, dst_scan_port, scan_type, "Open");
+        add_scan_result(results, src_ip, dst_scan_port, scan_type, os_guess, "Open");
     } else if (flags & TH_RST) {
         // RST received → port is closed or unfiltered depending on scan type
         if (scan_type == SCAN_ACK) {
             // ACK scan: RST means "Unfiltered"
-            add_scan_result(results, src_ip, dst_scan_port, scan_type, "Unfiltered");
+            add_scan_result(results, src_ip, dst_scan_port, scan_type, os_guess, "Unfiltered");
         } else {
             // SYN/NULL/FIN/XMAS scan: RST means "Closed"
-            add_scan_result(results, src_ip, dst_scan_port, scan_type, "Closed");
+            add_scan_result(results, src_ip, dst_scan_port, scan_type, os_guess, "Closed");
         }
     } else {
         // Received some unexpected flag combo — log it for debugging

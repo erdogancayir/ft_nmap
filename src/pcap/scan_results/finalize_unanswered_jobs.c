@@ -60,7 +60,7 @@ void finalize_unanswered_jobs(t_job_queue *queue, t_shared_results *results) {
         // If this job has no recorded result, add a fallback result
         if (!found) {
             const char *status = status_for_no_response(job->type);
-            add_scan_result(results, job->target_ip, job->target_port, job->type, status);
+            add_scan_result(results, job->target_ip, job->target_port, job->type, "Unknown", status);
         }
     }
 }

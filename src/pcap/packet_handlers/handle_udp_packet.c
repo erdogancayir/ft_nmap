@@ -39,6 +39,13 @@ void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results
     // Recover the scan type from the source port encoding
     int scan_type = extract_scan_type_from_dst_port(src_port, results->scan_type_count);
 
+    const struct ip *ip_header = (const struct ip *)(packet + ETHERNET_HDR_LEN);
+    int ttl = ip_header->ip_ttl;
+
+    // Window size is not available in UDP, pass 0
+    const char *os_guess = guess_os(ttl, 0);
+
+
     // Since UDP services often don't reply, any UDP response is interpreted as "Open|Filtered"
-    add_scan_result(results, src_ip, dst_scan_port, scan_type, "Open|Filtered");
+    add_scan_result(results, src_ip, dst_scan_port, scan_type, os_guess, "Open|Filtered");
 }

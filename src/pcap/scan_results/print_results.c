@@ -24,24 +24,21 @@ void print_results(t_shared_results *results, double duration) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
 
-            // Eğer versiyon bilgisi daha önce alınmamışsa burada al
-            if (!cur->version || strlen(cur->version) == 0) {
+            if (!cur->version || strlen(cur->version) == 0)
                 cur->version = grab_banner(cur->ip, cur->port);
-            }
 
             printf("%-5d %-36s %-17s %s\n",
-                   cur->port,
-                   service_name,
-                   scan_type_to_str(cur->scan_type),
-                   cur->status);
+                   cur->port, service_name,
+                   scan_type_to_str(cur->scan_type), cur->status);
 
             printf("      ↳🎯 Target Host: %s (%s)\n",
-                   cur->hostname ? cur->hostname : "N/A",
-                   cur->ip);
+                   cur->hostname ? cur->hostname : "N/A", cur->ip);
 
-            if (cur->version && strlen(cur->version) > 0) {
+            if (cur->version && strlen(cur->version) > 0)
                 printf("      ↳🧩 Version Info: %s\n", cur->version);
-            }
+
+            if (cur->os_guess && strlen(cur->os_guess) > 0)
+                printf("      ↳🖥  OS Guess: %s\n", cur->os_guess);
         }
         cur = cur->next;
     }
@@ -57,14 +54,14 @@ void print_results(t_shared_results *results, double duration) {
             const char *service_name = serv ? serv->s_name : "Unassigned";
 
             printf("%-5d %-36s %-17s %s\n",
-                   cur->port,
-                   service_name,
-                   scan_type_to_str(cur->scan_type),
-                   cur->status);
+                   cur->port, service_name,
+                   scan_type_to_str(cur->scan_type), cur->status);
 
             printf("      ↳🎯 Target Host: %s (%s)\n",
-                   cur->hostname ? cur->hostname : "N/A",
-                   cur->ip);
+                   cur->hostname ? cur->hostname : "N/A", cur->ip);
+
+            if (cur->os_guess && strlen(cur->os_guess) > 0)
+                printf("      ↳🖥  OS Guess: %s\n", cur->os_guess);
         }
         cur = cur->next;
     }

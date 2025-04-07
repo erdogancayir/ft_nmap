@@ -63,7 +63,13 @@ void handle_icmp_packet(const u_char *packet, int ip_header_len, t_shared_result
 
             // Mark this UDP port as closed
             int scan_type = SCAN_UDP;
-            add_scan_result(results, src_ip, target_port, scan_type, "Closed");
+
+            // Get outer IP header for TTL-based OS guess
+            const struct ip *outer_ip = (const struct ip *)(packet + ETHERNET_HDR_LEN);
+            int ttl = outer_ip->ip_ttl;
+            const char *os_guess = guess_os(ttl, 0);
+
+            add_scan_result(results, src_ip, target_port, scan_type, os_guess, "Closed");
         }
     }
 }

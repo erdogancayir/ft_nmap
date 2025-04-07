@@ -10,6 +10,7 @@
         "tcp.h": "c",
         "string.h": "c",
         "ip.h": "c",
-        "job_queue.h": "c"
+        "job_queue.h": "c",
+        "stdlib.h": "c"
     }
 }

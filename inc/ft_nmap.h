@@ -32,7 +32,7 @@ bool find_source_ip_and_iface(char **ip_out, char **iface_out);
 void *pcap_listener_thread(void *arg);
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
 void *sniffer_thread(void *arg);
-void add_scan_result(t_shared_results *results, const char *ip, int port, scan_type scan_type, const char *status);
+void add_scan_result(t_shared_results *results, const char *ip, int port, scan_type scan_type, const char *os_guess, const char *status);
 void print_results(t_shared_results *results, double duration);
 char *resolve_adress(char *ip);
 void print_tcp_packet_debug(const struct tcphdr *tcp, const char *src_ip, int matched_port);
@@ -51,5 +51,6 @@ char *build_bpf_filter(t_shared_results *results, int ip_count);
 
 char *reverse_dns_lookup(const char *ip_addr);
 char *grab_banner(const char *ip, int port);
+const char* guess_os(int ttl, int window_size);
 
 #endif

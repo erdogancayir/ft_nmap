@@ -3,7 +3,7 @@
 #include "ft_nmap.h"
 #include "job_queue.h"
 
-void add_scan_result(t_shared_results *results, const char *ip, int port, scan_type scan_type, const char *status) {
+void add_scan_result(t_shared_results *results, const char *ip, int port, scan_type scan_type, const char *os_guess, const char *status) {
     t_scan_result *new_result = malloc(sizeof(t_scan_result));
     new_result->ip = strdup(ip);
     new_result->port = port;
@@ -12,6 +12,7 @@ void add_scan_result(t_shared_results *results, const char *ip, int port, scan_t
     new_result->hostname = reverse_dns_lookup(ip);
     new_result->next = NULL;
     new_result->version = NULL;
+    new_result->os_guess = strdup(os_guess);
 
     pthread_mutex_lock(&results->mutex);
 

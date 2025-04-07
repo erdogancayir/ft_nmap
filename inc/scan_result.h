@@ -16,6 +16,7 @@ typedef struct s_scan_result {
     char *status;  // Open, Filtered, Closed
     char *hostname;
     char *version;
+    char *os_guess; // OS guess based on TTL and window size
 
     struct s_scan_result *next;
 } t_scan_result;
