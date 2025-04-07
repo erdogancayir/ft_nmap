@@ -13,30 +13,40 @@ void print_results(t_shared_results *results, double duration) {
 
     pthread_mutex_lock(&results->mutex);
 
-    printf("\nOpen Ports:\n");
-    printf("Port  Service Name (if applicable)        Scan-Type         Conclusion\n");
-    printf("-----------------------------------------------------\n");
+    printf("\n🟢 Open Ports:\n");
+    printf("Port  Service Name (if applicable)        Scan-Type         Status\n");
+    printf("---------------------------------------------------------------------\n");
 
     t_scan_result *cur = results->head;
     while (cur) {
         if (strcmp(cur->status, "Open") == 0 || strcmp(cur->status, "Open|Filtered") == 0) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
-            printf("%-5d %-36s %-17s %s\n", cur->port, service_name, scan_type_to_str(cur->scan_type), cur->status);
+            printf("%-5d %-36s %-17s %s\n",
+                   cur->port,
+                   service_name,
+                   scan_type_to_str(cur->scan_type),
+                   cur->status);
+            printf("      ↳🎯 Target Host: %s (%s)\n", cur->hostname ? cur->hostname : "N/A", cur->ip);
         }
         cur = cur->next;
     }
 
-    printf("\nClosed/Filtered/Unfiltered Ports:\n");
-    printf("Port  Service Name (if applicable)        Scan-Type         Conclusion\n");
-    printf("-----------------------------------------------------\n");
+    printf("\n🔒 Closed/Filtered/Unfiltered Ports:\n");
+    printf("Port  Service Name (if applicable)        Scan-Type         Status\n");
+    printf("---------------------------------------------------------------------\n");
 
     cur = results->head;
     while (cur) {
         if (strcmp(cur->status, "Open") != 0 && strcmp(cur->status, "Open|Filtered") != 0) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
-            printf("%-5d %-36s %-17s %s\n", cur->port, service_name, scan_type_to_str(cur->scan_type), cur->status);
+            printf("%-5d %-36s %-17s %s\n",
+                   cur->port,
+                   service_name,
+                   scan_type_to_str(cur->scan_type),
+                   cur->status);
+            printf("      ↳🎯 Target Host: %s (%s)\n", cur->hostname ? cur->hostname : "N/A", cur->ip);
         }
         cur = cur->next;
     }

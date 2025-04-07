@@ -14,6 +14,7 @@ typedef struct s_scan_result {
     int port;
     scan_type scan_type; // SYN, NULL, vs.
     char *status;  // Open, Filtered, Closed
+    char *hostname; // Hostname if resolved
     struct s_scan_result *next;
 } t_scan_result;
 

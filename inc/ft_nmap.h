@@ -49,5 +49,6 @@ int extract_scan_type_from_dst_port(int dst_port, int scan_type_count);
 void finalize_unanswered_jobs(t_job_queue *queue, t_shared_results *results);
 char *build_bpf_filter(t_shared_results *results, int ip_count);
 
+char *reverse_dns_lookup(const char *ip_addr);
 
 #endif

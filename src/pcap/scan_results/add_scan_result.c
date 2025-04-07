@@ -9,6 +9,7 @@ void add_scan_result(t_shared_results *results, const char *ip, int port, scan_t
     new_result->port = port;
     new_result->scan_type = scan_type;
     new_result->status = strdup(status);
+    new_result->hostname = reverse_dns_lookup(ip);
     new_result->next = NULL;
 
     pthread_mutex_lock(&results->mutex);
