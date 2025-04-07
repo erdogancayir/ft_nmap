@@ -38,5 +38,6 @@ void free_scan_result(t_scan_result *result) {
 		free(temp);
         free(temp->hostname);
         free(temp->version);
+        free(temp->os_guess);
 	}
 }
