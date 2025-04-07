@@ -19,6 +19,9 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     q->done = false;
 
     pthread_mutex_init(&q->mutex, NULL);
+
+    pthread_cond_init(&q->cond, NULL);
+
     q->my_ip = my_ip;
 
     int job_index = 0;
@@ -53,15 +56,19 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
  * @return      true if successful, false if the queue is full
  */
 bool enqueue_job(t_job_queue *q, t_scan_job job) {
-    int next = (q->tail + 1) % MAX_QUEUE;
+    pthread_mutex_lock(&q->mutex);
 
-    // If next is equal to head, the queue is full
+    int next = (q->tail + 1) % MAX_QUEUE;
     if (next == q->head) {
-        return false;
+        pthread_mutex_unlock(&q->mutex);
+        return false; // Queue full
     }
 
     q->jobs[q->tail] = job;
     q->tail = next;
+
+    pthread_cond_signal(&q->cond); // ✅ önemli
+    pthread_mutex_unlock(&q->mutex);
     return true;
 }
 
@@ -99,4 +106,6 @@ bool dequeue_job(t_job_queue *q, t_scan_job *job) {
 
 void free_job_queue(t_job_queue *q) {
 	free(q->jobs);
+	pthread_mutex_destroy(&q->mutex);
+	pthread_cond_destroy(&q->cond);
 }
