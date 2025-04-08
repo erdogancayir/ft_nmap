@@ -23,6 +23,9 @@ typedef struct {
     int ip_count;
     bool stealth_mode;
     bool evade_mode;
+
+    bool spoof_mode;
+    char *spoof_ip;
 } t_scan_config;
 
 

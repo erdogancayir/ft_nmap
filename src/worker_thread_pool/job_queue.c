@@ -16,6 +16,8 @@
 void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     // Initialize queue state
     q->stealth_mode = config.stealth_mode;
+    q->spoof_mode = config.spoof_mode;
+    q->spoof_ip = config.spoof_ip;
     q->evade_mode = config.evade_mode;
     q->head = q->tail = 0;
     q->done = false;
@@ -25,6 +27,8 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     pthread_cond_init(&q->cond, NULL);
 
     q->my_ip = my_ip;
+    if (q->spoof_mode)
+        q->my_ip = config.spoof_ip;
 
     int job_index = 0;
 	int total_jobs = config.ip_count * config.port_count * config.scan_count;
