@@ -477,31 +477,22 @@ graph TD
 
     %% Component Details
     subgraph Job Queue Details
-        direction LR
         J1[Job Creation]
         J2[Thread Distribution]
         J3[Result Collection]
     end
 
     subgraph Thread Pool Details
-        direction LR
         T1[Worker Threads]
         T2[Sniffer Thread]
         T3[Main Thread]
     end
 
     subgraph Packet Processing
-        direction LR
         P1[TCP Packets]
         P2[UDP Packets]
         P3[ICMP Messages]
     end
-
-    %% Styling
-    classDef component fill:#f9f,stroke:#333,stroke-width:2px
-    classDef subgraph fill:#eee,stroke:#333,stroke-width:1px
-    class CLI,Args,Config,Queue,ThreadPool,Scanner,PacketCraft,Sniffer,RawSock,PCAP,Results,Printer component
-    class User,Core,Scanning,Network,Results subgraph
 ```
 
 ### Architecture Components
