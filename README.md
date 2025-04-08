@@ -455,8 +455,8 @@ graph TD
         PCAP[PCAP Interface]
     end
 
-    subgraph Results
-        Results[Result Aggregator]
+    subgraph Results Processing
+        Aggregator[Result Aggregator]
         Printer[Result Printer]
     end
 
@@ -471,9 +471,9 @@ graph TD
     RawSock --> Network[Network]
     Network --> PCAP
     PCAP --> Sniffer
-    Sniffer --> Results
-    Scanner --> Results
-    Results --> Printer
+    Sniffer --> Aggregator
+    Scanner --> Aggregator
+    Aggregator --> Printer
 
     %% Component Details
     subgraph Job Queue Details
