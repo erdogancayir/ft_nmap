@@ -98,27 +98,23 @@ void *sniffer_thread(void *arg) {
 }
 
 char *build_bpf_filter(t_shared_results *results, int ip_count) {
-    char *filter = malloc(1024);
+    if (ip_count <= 0) return NULL;
+    size_t estimate_len = 64 + (ip_count * 32);
+    char *filter = calloc(1, estimate_len);
     if (!filter) {
-        perror("malloc failed for BPF filter");
+        perror("calloc failed for BPF filter");
         exit(EXIT_FAILURE);
     }
-
-    strcpy(filter, "tcp and (");
-
+    strcat(filter, "(tcp or icmp) and (");
     for (int i = 0; i < ip_count; i++) {
         strcat(filter, "src host ");
         strcat(filter, results[i].target_ip);
-
         if (i < ip_count - 1) {
             strcat(filter, " or ");
         }
     }
-
     strcat(filter, ") and dst host ");
-    strcat(filter, results[0].my_ip);  // Aynı IP tüm işlerde geçerli
-
-    DEBUG_PRINT("📡 Applied BPF filter: %s\n", filter);
-
+    strcat(filter, results[0].my_ip);
+    DEBUG_PRINT(":satellite_antenna: Applied BPF filter: %s\n", filter);
     return filter;
 }

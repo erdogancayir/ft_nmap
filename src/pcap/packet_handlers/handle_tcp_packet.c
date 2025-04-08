@@ -40,6 +40,7 @@ void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results
 
     // Print detailed debug output for visibility
     print_tcp_packet_debug(tcp, src_ip, dst_scan_port);
+	DEBUG_PRINT("SRC Port")
 
     // Recover the scan type we used based on our encoded src port
     int scan_type = extract_scan_type_from_dst_port(src_port, results->scan_type_count);

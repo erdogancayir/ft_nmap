@@ -1,7 +1,7 @@
 #ifndef JOB_QUEUE_H
 #define JOB_QUEUE_H
 
-#define MAX_QUEUE 2048
+#define MAX_QUEUE 8192
 
 #ifndef TH_FLAGS
 #define TH_FIN  0x01

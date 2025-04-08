@@ -1,0 +1,11 @@
+
+🔍 [36mScan Configurations:[0m
+  Interface: [33menp0s3
+[0m  IP  Targets:   [32m142.251.140.14, [0m[32m45.33.32.156[0m
+  Ports:     [35m1, [0m[35m2, [0m[35m3, [0m[35m4, [0m[35m5, [0m[35m6, [0m[35m7, [0m[35m8, [0m[35m9, [0m[35m10, [0m... (+1014 more)
+  Scan Types: [34mSYN[0m [34mACK[0m
+  Speedup:   [33m250
+[0m  Stealth Mode:   [33mfalse
+[0m  Evade Mode:     [33mDisabled
+[0m  Spoof Mode:     [33mDisabled
+[0m  Decoy Mode:     Disabled

@@ -36,5 +36,6 @@ typedef struct s_shared_results {
 } t_shared_results;
 
 void free_scan_result(t_scan_result *result);
+t_shared_results *init_shared_results(t_scan_config *config, int queue_size);
 
 #endif

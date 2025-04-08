@@ -112,34 +112,43 @@ char **fill_multiple_ip_list(const char *filename, t_scan_config *config) {
         clean_exit(config, "❌ File does not exist");
     }
 
-    char **ip_list = malloc(sizeof(char *) * MAX_IPS);
+    char buffer[MAX_LINE_LENGTH];
+    int total_lines = 0;
+
+    while (fgets(buffer, sizeof(buffer), file)) {
+        buffer[strcspn(buffer, "\r\n")] = '\0';
+        if (strlen(buffer) > 0)
+            total_lines++;
+    }
+
+    if (total_lines > MAX_IPS)
+        total_lines = MAX_IPS;
+
+    char **ip_list = malloc(sizeof(char *) * (total_lines + 1));
     if (!ip_list) {
+        fclose(file);
         clean_exit(config, "❌ Memory allocation failed for ip_list.");
     }
 
-    char line[MAX_LINE_LENGTH];
+    rewind(file);
     int count = 0;
 
-    while (fgets(line, sizeof(line), file) && count < MAX_IPS) {
-        // clean newline characters
-        line[strcspn(line, "\r\n")] = 0;
+    while (fgets(buffer, sizeof(buffer), file) && count < total_lines) {
+        buffer[strcspn(buffer, "\r\n")] = '\0';
 
-        if (strlen(line) == 0)
+        if (strlen(buffer) == 0)
             continue;
 
-        ip_list[count] = strdup(resolve_adress(line));
+        ip_list[count] = strdup(resolve_adress(buffer));
         if (!ip_list[count]) {
+            fclose(file);
             clean_exit(config, "❌ Memory allocation failed for IP address.");
         }
-
         count++;
     }
 
     fclose(file);
-
-    // Null-terminate diziyi (istersen)
     ip_list[count] = NULL;
-
     return ip_list;
 }
 
@@ -196,8 +205,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--speedup") == 0 && i+1 < argc)
         {
             config->speedup = atoi(argv[++i]);
-            if (config->speedup <= 0 || config->speedup > 250) {
-                clean_exit(config, "❌ Invalid --speedup value. Must be between 1 and 250.");
+            if (config->speedup <= 0) {
+                clean_exit(config, "❌ Speedup must be a positive integer.");
             }
         }
         else if (strcmp(argv[i], "--stealth") == 0) {
