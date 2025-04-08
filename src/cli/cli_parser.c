@@ -29,7 +29,7 @@ void print_help() {
     printf("  --scan <types>       Scan types: SYN,NULL,FIN,XMAS,ACK,UDP\n");
     printf("  --speedup <number>   Number of threads (default 0, max 250)\n");
     printf("  --stealth            Enable stealth mode\n");
-    printf(" --evade              Enable evade mode\n");
+    printf("  --evade              Enable evade mode\n");
     printf("  --spoof <address>    Spoof source IP address\n");
     printf("  --decoy <list>       Decoy IPs (comma-separated)\n");
     exit(0);

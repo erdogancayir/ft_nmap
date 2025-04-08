@@ -43,7 +43,9 @@ void *sniffer_thread(void *arg) {
     if (pcap_compile(handle, &fp, filter_exp, 0, PCAP_NETMASK_UNKNOWN) == -1 ||
         pcap_setfilter(handle, &fp) == -1) {
         fprintf(stderr, "pcap filter error: %s\n", pcap_geterr(handle));
-        pcap_close(handle);
+		pcap_freecode(&fp);
+		free(filter_exp);
+		pcap_close(handle);
         pthread_exit(NULL);
     }
 
@@ -90,7 +92,8 @@ void *sniffer_thread(void *arg) {
     }
 
     // Cleanup and exit
-    pcap_close(handle);
+	pcap_freecode(&fp);
+	pcap_close(handle);
     pthread_exit(NULL);
 }
 

@@ -29,15 +29,15 @@ void free_scan_result(t_scan_result *result) {
 		return;	
 	}
 
-	t_scan_result *cur = result->next;
+	t_scan_result *cur = result;
 	while (cur) {
-		t_scan_result *temp = cur;
-		cur = cur->next;
-		free(temp->ip);
-		free(temp->status);
-        free(temp->hostname);
-        free(temp->version);
-        free(temp->os_guess);
-		free(temp);
+		t_scan_result *temp = cur->next;
+		free(cur->ip);
+		free(cur->status);
+        free(cur->hostname);
+        free(cur->version);
+        free(cur->os_guess);
+		free(cur);
+		cur = temp;
 	}
 }
