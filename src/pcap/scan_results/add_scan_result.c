@@ -35,9 +35,9 @@ void free_scan_result(t_scan_result *result) {
 		cur = cur->next;
 		free(temp->ip);
 		free(temp->status);
-		free(temp);
         free(temp->hostname);
         free(temp->version);
         free(temp->os_guess);
+		free(temp);
 	}
 }
