@@ -428,3 +428,162 @@ sudo ./ft_nmap --ip 192.168.1.1 --speedup 100 --port 80,443,8080 --scan SYN,UDP
 sudo ./ft_nmap --file targets.txt --speedup 150 --port 20-25,80,443,3306 --scan SYN,ACK
 ```
 </details>
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph User Interface
+        CLI[Command Line Interface]
+        Args[Argument Parser]
+    end
+
+    subgraph Core Components
+        Config[Scan Configuration]
+        Queue[Job Queue System]
+        ThreadPool[Thread Pool Manager]
+    end
+
+    subgraph Scanning Engine
+        Scanner[Port Scanner]
+        PacketCraft[Packet Crafter]
+        Sniffer[Packet Sniffer]
+    end
+
+    subgraph Network Layer
+        RawSock[Raw Socket]
+        PCAP[PCAP Interface]
+    end
+
+    subgraph Results
+        Results[Result Aggregator]
+        Printer[Result Printer]
+    end
+
+    %% Connections
+    CLI --> Args
+    Args --> Config
+    Config --> Queue
+    Queue --> ThreadPool
+    ThreadPool --> Scanner
+    Scanner --> PacketCraft
+    PacketCraft --> RawSock
+    RawSock --> Network[Network]
+    Network --> PCAP
+    PCAP --> Sniffer
+    Sniffer --> Results
+    Scanner --> Results
+    Results --> Printer
+
+    %% Component Details
+    subgraph Job Queue Details
+        direction LR
+        J1[Job Creation]
+        J2[Thread Distribution]
+        J3[Result Collection]
+    end
+
+    subgraph Thread Pool Details
+        direction LR
+        T1[Worker Threads]
+        T2[Sniffer Thread]
+        T3[Main Thread]
+    end
+
+    subgraph Packet Processing
+        direction LR
+        P1[TCP Packets]
+        P2[UDP Packets]
+        P3[ICMP Messages]
+    end
+
+    %% Styling
+    classDef component fill:#f9f,stroke:#333,stroke-width:2px
+    classDef subgraph fill:#eee,stroke:#333,stroke-width:1px
+    class CLI,Args,Config,Queue,ThreadPool,Scanner,PacketCraft,Sniffer,RawSock,PCAP,Results,Printer component
+    class User,Core,Scanning,Network,Results subgraph
+```
+
+### Architecture Components
+
+1. **User Interface Layer**
+   - Command Line Interface (CLI)
+   - Argument Parser
+   - Configuration Management
+
+2. **Core Components**
+   - Scan Configuration
+   - Job Queue System
+   - Thread Pool Manager
+
+3. **Scanning Engine**
+   - Port Scanner
+   - Packet Crafter
+   - Packet Sniffer
+
+4. **Network Layer**
+   - Raw Socket Interface
+   - PCAP Interface
+   - Network Communication
+
+5. **Results Processing**
+   - Result Aggregator
+   - Result Printer
+   - Status Reporting
+
+### Data Flow
+
+1. **Command Processing**
+   ```
+   User Input → CLI → Argument Parser → Configuration
+   ```
+
+2. **Scan Execution**
+   ```
+   Configuration → Job Queue → Thread Pool → Scanner
+   ```
+
+3. **Network Operations**
+   ```
+   Scanner → Packet Crafter → Raw Socket → Network
+   Network → PCAP → Sniffer → Results
+   ```
+
+4. **Result Handling**
+   ```
+   Scanner + Sniffer → Result Aggregator → Result Printer
+   ```
+
+### Thread Management
+
+1. **Main Thread**
+   - Handles user input
+   - Manages configuration
+   - Coordinates other threads
+
+2. **Worker Threads**
+   - Execute port scans
+   - Craft packets
+   - Process responses
+
+3. **Sniffer Thread**
+   - Captures network packets
+   - Processes responses
+   - Updates results
+
+### Resource Management
+
+1. **Memory Management**
+   - Dynamic allocation for jobs
+   - Buffer management for packets
+   - Result storage optimization
+
+2. **Thread Resources**
+   - Thread pool sizing
+   - Thread synchronization
+   - Resource cleanup
+
+3. **Network Resources**
+   - Socket management
+   - PCAP handle management
+   - Buffer allocation
