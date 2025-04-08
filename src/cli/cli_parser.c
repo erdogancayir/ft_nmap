@@ -31,6 +31,7 @@ void print_help() {
     printf("  --stealth            Enable stealth mode\n");
     printf(" --evade              Enable evade mode\n");
     printf("  --spoof <address>    Spoof source IP address\n");
+    printf("  --decoy <list>       Decoy IPs (comma-separated)\n");
     exit(0);
 }
 
