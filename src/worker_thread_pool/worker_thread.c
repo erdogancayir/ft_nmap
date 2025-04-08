@@ -33,23 +33,23 @@ void *worker_thread(void *arg) {
         switch (job.type) {
             case SCAN_SYN:
                 // Send TCP packet with SYN flag for SYN scan
-                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_SYN);
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_SYN, q->evade_mode);
                 break;
             case SCAN_NULL:
                 // Send TCP packet with no flags for NULL scan
-                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, 0x00);
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, 0x00, q->evade_mode);
                 break;
             case SCAN_FIN:
                 // Send TCP packet with FIN flag for FIN scan
-                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN);
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN, q->evade_mode);
                 break;
             case SCAN_XMAS:
                 // Send TCP packet with FIN, PUSH, URG flags for XMAS scan
-                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN | TH_PUSH | TH_URG);
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_FIN | TH_PUSH | TH_URG, q->evade_mode);
                 break;
             case SCAN_ACK:
                 // Send TCP packet with ACK flag for ACK scan
-                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_ACK);
+                send_tcp_packet(q->my_ip, job.target_ip, job.src_port, job.target_port, TH_ACK, q->evade_mode);
                 break;
             case SCAN_UDP:
                 // Send raw UDP packet for UDP scan

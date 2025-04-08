@@ -35,6 +35,7 @@ typedef struct {
     int head;
     int tail;
     bool stealth_mode;
+    bool evade_mode;
 
     pthread_mutex_t mutex;
     pthread_cond_t cond;

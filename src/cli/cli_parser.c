@@ -154,6 +154,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     config->my_interface = my_iface;
     int both_ip_and_file = 0;
     config->stealth_mode = false;
+    config->evade_mode = false;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0) {
@@ -194,6 +195,9 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         }
         else if (strcmp(argv[i], "--stealth") == 0) {
             config->stealth_mode = true;
+        }
+        else if (strcmp(argv[i], "--evade") == 0) {
+            config->evade_mode = true;
         }
         else {
             clean_exit(config, "❌ Unknown or missing argument");

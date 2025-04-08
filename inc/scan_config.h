@@ -22,6 +22,7 @@ typedef struct {
     char *my_interface;
     int ip_count;
     bool stealth_mode;
+    bool evade_mode;
 } t_scan_config;
 
 

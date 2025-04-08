@@ -45,20 +45,40 @@ unsigned short compute_checksum(unsigned short *addr, int len) {
     return (unsigned short)(~sum);
 }
 
-void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int dst_port, uint8_t flags) {
+void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int dst_port, uint8_t flags, bool evade_mode) {
     char packet[4096];
     memset(packet, 0, sizeof(packet));
 
     struct ip *ip_hdr = (struct ip *)packet;
     struct tcphdr *tcp_hdr = (struct tcphdr *)(packet + sizeof(struct ip));
 
+    int tcp_header_len = sizeof(struct tcphdr);
+    int total_packet_len = sizeof(struct ip) + tcp_header_len;
+
+    // If evade mode, apply TCP options
+    u_char tcp_options[4] = {2, 4, 0x05, 0xb4}; // MSS = 1460
+
+    if (evade_mode) {
+        // Set custom evasion flags
+        flags = TH_URG | TH_FIN | TH_PUSH;
+        tcp_hdr->th_flags = flags;
+
+        // Apply TCP options and update header size
+        memcpy((u_char *)tcp_hdr + tcp_header_len, tcp_options, sizeof(tcp_options));
+        tcp_header_len += sizeof(tcp_options);
+        tcp_hdr->th_off = tcp_header_len >> 2;  // Header length in 32-bit words
+
+        total_packet_len = sizeof(struct ip) + tcp_header_len;
+    } else {
+        tcp_hdr->th_off = sizeof(struct tcphdr) >> 2;  // No options: 20 bytes = 5 * 4
+        tcp_hdr->th_flags = flags;
+    }
+
     // Fill TCP header
     tcp_hdr->th_sport = htons(src_port);
     tcp_hdr->th_dport = htons(dst_port);
     tcp_hdr->th_seq = htonl(rand());
     tcp_hdr->th_ack = 0;
-    tcp_hdr->th_off = 5;  // Header size = 20 bytes
-    tcp_hdr->th_flags = flags;
     tcp_hdr->th_win = htons(65535);
     tcp_hdr->th_sum = 0;
     tcp_hdr->th_urp = 0;
@@ -114,7 +134,7 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
 
     print_packet_debug(ip_hdr, tcp_hdr, src_ip, dst_ip);
 
-    if (sendto(sock, packet, sizeof(struct ip) + sizeof(struct tcphdr), 0,
+    if (sendto(sock, packet, total_packet_len, 0,
                (struct sockaddr *)&dest, sizeof(dest)) < 0) {
         perror("sendto");
     }
