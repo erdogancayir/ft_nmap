@@ -579,6 +579,9 @@ graph TD
    - PCAP handle management
    - Buffer allocation
 
+```bash
+make debug
+```
 
 <img width="811" alt="Screenshot 2025-04-08 at 17 17 30" src="https://github.com/user-attachments/assets/66233e42-9fb1-4f43-9d12-493fcdf3b591" />
 
