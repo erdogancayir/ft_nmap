@@ -21,6 +21,8 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     q->evade_mode = config.evade_mode;
     q->head = q->tail = 0;
     q->done = false;
+    q->decoy_count = config.decoy_count;
+    q->decoy_ips = config.decoy_ips;
 
     pthread_mutex_init(&q->mutex, NULL);
 

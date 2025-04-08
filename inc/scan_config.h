@@ -26,6 +26,9 @@ typedef struct {
 
     bool spoof_mode;
     char *spoof_ip;
+
+    char **decoy_ips;
+    int decoy_count;
 } t_scan_config;
 
 

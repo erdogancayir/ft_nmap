@@ -38,6 +38,9 @@ typedef struct {
     bool evade_mode;
     bool spoof_mode;
     char *spoof_ip;
+    
+    char **decoy_ips;
+    int decoy_count;
 
     pthread_mutex_t mutex;
     pthread_cond_t cond;

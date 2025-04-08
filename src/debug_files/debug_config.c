@@ -46,4 +46,12 @@ void print_config(t_scan_config *config) {
     if (config->spoof_mode) {
         printf("  Spoof IP:       " CLR_YELLOW "%s\n" CLR_RESET, config->spoof_ip);
     }
+
+    if (config->decoy_count > 0) {
+        printf("  Decoy Mode:     Enabled (%d IP)\n", config->decoy_count);
+        for (int i = 0; i < config->decoy_count; i++)
+            printf("      -" CLR_YELLOW " %s\n", config->decoy_ips[i]);
+    } else {
+        printf("  Decoy Mode:     Disabled\n");
+    }
 }

@@ -159,6 +159,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     config->evade_mode = false;
     config->spoof_mode = false;
     config->spoof_ip = NULL;
+    config->decoy_ips = NULL;
+    config->decoy_count = 0;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0) {
@@ -206,6 +208,17 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--spoof") == 0 && i+1 < argc) {
             config->spoof_mode = true;
             config->spoof_ip = strdup(resolve_adress(argv[++i]));
+        }
+        else if (strcmp(argv[i], "--decoy") == 0 && i + 1 < argc) {
+            char *token;
+            int count = 0;
+            config->decoy_ips = malloc(sizeof(char *) * 10);  // max 10 decoy (genişletilebilir)
+            token = strtok(argv[++i], ",");
+            while (token && count < 10) {
+                config->decoy_ips[count++] = strdup(token);
+                token = strtok(NULL, ",");
+            }
+            config->decoy_count = count;
         }
         else {
             clean_exit(config, "❌ Unknown or missing argument");
