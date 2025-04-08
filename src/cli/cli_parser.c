@@ -28,6 +28,7 @@ void print_help() {
     printf("  --ports <list>       Ports to scan (e.g. 22,80 or 20-25)\n");
     printf("  --scan <types>       Scan types: SYN,NULL,FIN,XMAS,ACK,UDP\n");
     printf("  --speedup <number>   Number of threads (default 0, max 250)\n");
+    printf("  --stealth            Enable stealth mode\n");
     exit(0);
 }
 
