@@ -60,8 +60,12 @@ void *worker_thread(void *arg) {
         // Print formatted output for each sent scan attempt
         print_sent_message(job.target_ip, job.target_port, scan_type_to_str(job.type));
 
-        // Slight delay between jobs to prevent flooding the network
-        usleep(1000);  // Sleep 1 millisecond
+        // 🧩 Timing-Based Evasion: Stealth Mode (100ms delay)
+        if (q->stealth_mode) {
+            usleep(100000);  // 100 milliseconds
+        } else {
+            usleep(1000);  // default: 1 millisecond
+        }
     }
 
     return NULL;

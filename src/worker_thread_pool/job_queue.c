@@ -15,6 +15,7 @@
  */
 void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
     // Initialize queue state
+    q->stealth_mode = config.stealth_mode;
     q->head = q->tail = 0;
     q->done = false;
 

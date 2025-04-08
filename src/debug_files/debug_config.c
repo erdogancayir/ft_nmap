@@ -40,4 +40,5 @@ void print_config(t_scan_config *config) {
     printf("\n");
 
     printf("  Speedup:   " CLR_YELLOW "%d\n" CLR_RESET, config->speedup);
+    printf("  Stealth Mode:   " CLR_YELLOW "%s\n" CLR_RESET, config->stealth_mode ? "true" : "false");
 }
