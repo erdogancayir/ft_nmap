@@ -16,6 +16,9 @@
 #define PORT_SCAN_BASE 40000
 #define SCAN_TYPE_OFFSET 1000
 
+#define CLR_MAGENTA "\x1b[35m"
+#define CLR_RESET   "\x1b[0m"
+
 // Timeout threshold for sniffer (in milliseconds)
 #define SNIFFER_TIMEOUT_MS 3000
 

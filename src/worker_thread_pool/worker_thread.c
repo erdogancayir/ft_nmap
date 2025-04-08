@@ -68,10 +68,10 @@ void *worker_thread(void *arg) {
         if (scan_flags != 0) {
             for (int i = 0; i < q->decoy_count; i++) {
                 send_tcp_packet(q->decoy_ips[i], job.target_ip, job.src_port, job.target_port, scan_flags, q->evade_mode);
-                print_sent_message(q->decoy_ips[i], job.target_port, scan_type_to_str(job.type));
+                DEBUG_PRINT(CLR_MAGENTA "📤 Sent [Decoy] %s to %s Port: %d Type [%s]\n" CLR_RESET,
+                    q->decoy_ips[i], job.target_ip, job.target_port, scan_type_to_str(job.type));
             }
         }
-
 
         // Print formatted output for each sent scan attempt
         print_sent_message(job.target_ip, job.target_port, scan_type_to_str(job.type));
