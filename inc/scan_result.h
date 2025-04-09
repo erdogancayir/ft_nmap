@@ -33,6 +33,8 @@ typedef struct s_shared_results {
     int ip_count;
 
     int response_count;
+    scan_type scan_types[MAX_SCAN_TYPES];
+
 } t_shared_results;
 
 void free_scan_result(t_scan_result *result);

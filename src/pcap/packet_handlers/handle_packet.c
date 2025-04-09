@@ -26,12 +26,9 @@
  * @param scan_type_count  Total number of scan types used in this run.
  * @return                 Index of scan type (0 to scan_type_count-1), or -1 if invalid.
  */
-int extract_scan_type_from_dst_port(int src_port, int scan_type_count) {
-    if (src_port < PORT_SCAN_BASE) return -1; // Invalid source port (not assigned by scanner)
-
-    int index = src_port - PORT_SCAN_BASE;
-
-    return index % scan_type_count; // Returns scan type index
+int extract_scan_index_from_src_port(int src_port) {
+    if (src_port < PORT_SCAN_BASE) return -1;
+    return src_port - PORT_SCAN_BASE;
 }
 
 /**

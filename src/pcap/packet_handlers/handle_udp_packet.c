@@ -37,7 +37,8 @@ void handle_udp_packet(const u_char *packet, int ip_header_len, t_shared_results
     int src_port = ntohs(udp->uh_dport);
 
     // Recover the scan type from the source port encoding
-    int scan_type = extract_scan_type_from_dst_port(src_port, results->scan_type_count);
+    int scan_index = extract_scan_index_from_src_port(src_port);
+    int scan_type = results->scan_types[scan_index];
 
     const struct ip *ip_header = (const struct ip *)(packet + ETHERNET_HDR_LEN);
     int ttl = ip_header->ip_ttl;

@@ -1,4 +1,7 @@
 #include "scan_result.h"
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 void free_scan_result(t_scan_result *result) {
 	if (!result) {
@@ -39,6 +42,12 @@ t_shared_results *init_shared_results(t_scan_config *config, int queue_size)
         result->job_count = queue_size;
         pthread_mutex_init(&result->mutex, NULL);
     }
+
     shared_results->ip_count = config->ip_count;
+    for (int i = 0; i < config->ip_count; i++) {
+        shared_results[i].scan_type_count = config->scan_count;
+        memcpy(shared_results[i].scan_types, config->scan_types, sizeof(scan_type) * config->scan_count);
+    }
+
 	return shared_results;
 }

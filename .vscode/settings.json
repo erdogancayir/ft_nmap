@@ -11,6 +11,13 @@
         "string.h": "c",
         "ip.h": "c",
         "job_queue.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "__hash_table": "c",
+        "array": "c",
+        "type_traits": "c",
+        "limits": "c",
+        "ratio": "c",
+        "tuple": "c",
+        "variant": "c"
     }
 }
