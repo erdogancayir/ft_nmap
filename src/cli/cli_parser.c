@@ -34,6 +34,7 @@ void print_help() {
     printf("  --decoy <list>       Decoy IPs (comma-separated)\n");
     printf("  --os-guess           Enable OS guessing\n");
     printf("  --resolve-host       Resolve hostnames to IPs\n");
+    printf("  --version-info       Get version info\n");
     exit(0);
 }
 
@@ -175,6 +176,7 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     config->decoy_count = 0;
     config->os_guess_mode = false;
     config->resolve_host_mode = false;
+    config->version_info_mode = false;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0) {
@@ -239,6 +241,9 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         }
         else if (strcmp(argv[i], "--resolve-host") == 0) {
             config->resolve_host_mode = true;
+        }
+        else if (strcmp(argv[i], "--version-info") == 0) {
+            config->version_info_mode = true;
         }
         else {
             clean_exit(config, "❌ Unknown or missing argument");

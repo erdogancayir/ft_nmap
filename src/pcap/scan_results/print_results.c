@@ -24,7 +24,7 @@ void print_results(t_shared_results *results, double duration, t_scan_config *co
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
 
-            if (!cur->version || strlen(cur->version) == 0) {
+            if ((!cur->version || strlen(cur->version) == 0) && config->version_info_mode) {
                 cur->version = grab_banner(cur->ip, cur->port);
             }
 
@@ -36,7 +36,7 @@ void print_results(t_shared_results *results, double duration, t_scan_config *co
                 printf("      ↳🎯 Target Host: %s (%s)\n",
                     cur->hostname ? cur->hostname : "N/A", cur->ip);
 
-            if (cur->version && strlen(cur->version) > 0)
+            if (cur->version && strlen(cur->version) > 0 && config->version_info_mode)
                 printf("      ↳🧩 Version Info: %s\n", cur->version);
 
             if (cur->os_guess && strlen(cur->os_guess) > 0 && config->os_guess_mode)

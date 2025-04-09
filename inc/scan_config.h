@@ -25,6 +25,7 @@ typedef struct {
     bool evade_mode;
     bool os_guess_mode;
     bool resolve_host_mode;
+    bool version_info_mode;
 
     bool spoof_mode;
     char *spoof_ip;

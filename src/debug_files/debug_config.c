@@ -44,6 +44,7 @@ void print_config(t_scan_config *config) {
     printf("  Evade Mode:     " CLR_YELLOW "%s\n" CLR_RESET, config->evade_mode ? "Enabled" : "Disabled");
     printf("  OS Guessing:    " CLR_YELLOW "%s\n" CLR_RESET, config->os_guess_mode ? "Enabled" : "Disabled");
     printf("  Resolve Host:   " CLR_YELLOW "%s\n" CLR_RESET, config->resolve_host_mode ? "Enabled" : "Disabled");
+    printf("  Version Info:   " CLR_YELLOW "%s\n" CLR_RESET, config->version_info_mode ? "Enabled" : "Disabled");
     printf("  Spoof Mode:     " CLR_YELLOW "%s\n" CLR_RESET, config->spoof_mode ? "Enabled" : "Disabled");
     if (config->spoof_mode) {
         printf("  Spoof IP:       " CLR_YELLOW "%s\n" CLR_RESET, config->spoof_ip);
