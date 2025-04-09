@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
     double duration = (end_time.tv_sec - start_time.tv_sec)
                     + (end_time.tv_nsec - start_time.tv_nsec) / 1e9;
 
-    print_results(shared_results, duration);
+    print_results(shared_results, duration, &config);
 	free_job_queue(&queue);
     free_config(&config);
 	free_scan_result(shared_results->head);

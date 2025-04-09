@@ -32,6 +32,8 @@ void print_help() {
     printf("  --evade              Enable evade mode\n");
     printf("  --spoof <address>    Spoof source IP address\n");
     printf("  --decoy <list>       Decoy IPs (comma-separated)\n");
+    printf("  --os-guess           Enable OS guessing\n");
+    printf("  --resolve-host       Resolve hostnames to IPs\n");
     exit(0);
 }
 
@@ -171,6 +173,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
     config->spoof_ip = NULL;
     config->decoy_ips = NULL;
     config->decoy_count = 0;
+    config->os_guess_mode = false;
+    config->resolve_host_mode = false;
 
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0) {
@@ -229,6 +233,12 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
                 token = strtok(NULL, ",");
             }
             config->decoy_count = count;
+        }
+        else if (strcmp(argv[i], "--os-guess") == 0) {
+            config->os_guess_mode = true;
+        }
+        else if (strcmp(argv[i], "--resolve-host") == 0) {
+            config->resolve_host_mode = true;
         }
         else {
             clean_exit(config, "❌ Unknown or missing argument");

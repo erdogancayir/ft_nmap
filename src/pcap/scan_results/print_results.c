@@ -8,7 +8,7 @@
 #include "scan_type.h"
 #include "ft_nmap.h"
 
-void print_results(t_shared_results *results, double duration) {
+void print_results(t_shared_results *results, double duration, t_scan_config *config) {
     printf("\n==================== Scan Results ====================\n");
     printf("⏱ Scan took %.3f secs\n", duration);
 
@@ -24,20 +24,22 @@ void print_results(t_shared_results *results, double duration) {
             struct servent *serv = getservbyport(htons(cur->port), "tcp");
             const char *service_name = serv ? serv->s_name : "Unassigned";
 
-            if (!cur->version || strlen(cur->version) == 0)
+            if (!cur->version || strlen(cur->version) == 0) {
                 cur->version = grab_banner(cur->ip, cur->port);
+            }
 
             printf("%-5d %-36s %-17s %s\n",
                    cur->port, service_name,
                    scan_type_to_str(cur->scan_type), cur->status);
 
-            printf("      ↳🎯 Target Host: %s (%s)\n",
-                   cur->hostname ? cur->hostname : "N/A", cur->ip);
+            if (config->resolve_host_mode)
+                printf("      ↳🎯 Target Host: %s (%s)\n",
+                    cur->hostname ? cur->hostname : "N/A", cur->ip);
 
             if (cur->version && strlen(cur->version) > 0)
                 printf("      ↳🧩 Version Info: %s\n", cur->version);
 
-            if (cur->os_guess && strlen(cur->os_guess) > 0)
+            if (cur->os_guess && strlen(cur->os_guess) > 0 && config->os_guess_mode)
                 printf("      ↳🖥  OS Guess: %s\n", cur->os_guess);
         }
         cur = cur->next;
@@ -57,10 +59,11 @@ void print_results(t_shared_results *results, double duration) {
                    cur->port, service_name,
                    scan_type_to_str(cur->scan_type), cur->status);
 
-            printf("      ↳🎯 Target Host: %s (%s)\n",
+            if (config->resolve_host_mode)
+                printf("      ↳🎯 Target Host: %s (%s)\n",
                    cur->hostname ? cur->hostname : "N/A", cur->ip);
 
-            if (cur->os_guess && strlen(cur->os_guess) > 0)
+            if (cur->os_guess && strlen(cur->os_guess) > 0 && config->os_guess_mode)
                 printf("      ↳🖥  OS Guess: %s\n", cur->os_guess);
         }
         cur = cur->next;

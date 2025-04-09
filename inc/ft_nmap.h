@@ -36,7 +36,7 @@ void *pcap_listener_thread(void *arg);
 void packet_handler(unsigned char *args, const struct pcap_pkthdr *header, const unsigned char *packet);
 void *sniffer_thread(void *arg);
 void add_scan_result(t_shared_results *results, const char *ip, int port, scan_type scan_type, const char *os_guess, const char *status);
-void print_results(t_shared_results *results, double duration);
+void print_results(t_shared_results *results, double duration, t_scan_config *config);
 char *resolve_adress(char *ip);
 void print_tcp_packet_debug(const struct tcphdr *tcp, const char *src_ip, int matched_port);
 void print_packet_debug(const struct ip *ip_hdr, const struct tcphdr *tcp_hdr, const char *src_ip, const char *dst_ip);
