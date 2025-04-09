@@ -89,6 +89,14 @@ int parse_scan_types(const char *input, scan_type *scans, t_scan_config *config)
     bool has_invalid = false;
 
     while (token && count < MAX_SCAN_TYPES) {
+		for (int i = 0; i < count; i++)
+		{
+			if (strcmp(token, scans[i]) == 0)
+			{
+				token = strtok(NULL, ",");
+				continue;
+			}
+		}
         if (strcmp(token, "SYN") == 0) scans[count++] = SCAN_SYN;
         else if (strcmp(token, "NULL") == 0) scans[count++] = SCAN_NULL;
         else if (strcmp(token, "FIN") == 0) scans[count++] = SCAN_FIN;
@@ -101,12 +109,12 @@ int parse_scan_types(const char *input, scan_type *scans, t_scan_config *config)
         }
         token = strtok(NULL, ",");
     }
+	if (has_invalid)
+	{
+		clean_exit(config, "🚫 One or more scan types are invalid. Use --help for valid options.");
+	}
 
-    if (has_invalid) {
-        clean_exit(config, "🚫 One or more scan types are invalid. Use --help for valid options.");
-    }
-
-    return count;
+	return count;
 }
 
 char **fill_multiple_ip_list(const char *filename, t_scan_config *config) {
