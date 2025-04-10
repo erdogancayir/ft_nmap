@@ -254,7 +254,8 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
             config->version_info_mode = true;
         }
         else {
-            clean_exit(config, "❌ Unknown or missing argument");
+            printf("Unknown argument: %s\n", argv[i]);
+            clean_exit(config, "❌ Error");
         }
     }
 

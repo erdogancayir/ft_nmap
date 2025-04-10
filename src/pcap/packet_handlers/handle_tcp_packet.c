@@ -47,7 +47,6 @@ void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results
 
 	const char *os_guess = guess_os(ttl, window);
 
-
 	// Classify result based on TCP flags
 
 	if (flags & TH_SYN && flags & TH_ACK) {
