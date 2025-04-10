@@ -2,6 +2,7 @@
 #include <netdb.h>
 #include <string.h>
 #include <netdb.h>
+#include <stdlib.h>
 
 char *resolve_adress(char *ip)
 {

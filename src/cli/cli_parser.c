@@ -231,7 +231,10 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         }
         else if (strcmp(argv[i], "--spoof") == 0 && i+1 < argc) {
             config->spoof_mode = true;
-            config->spoof_ip = strdup(resolve_adress(argv[++i]));
+            config->spoof_ip = resolve_adress(argv[++i]);
+            if (!is_valid_ip(config->spoof_ip)) {
+                clean_exit(config, "❌ Invalid spoof IP address");
+            }
         }
         else if (strcmp(argv[i], "--decoy") == 0 && i + 1 < argc) {
             char *token;

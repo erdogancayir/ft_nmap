@@ -15,4 +15,8 @@ void free_config(t_scan_config *config) {
     if (config->my_interface) {
         free(config->my_interface);
     }
+
+    if (config->spoof_ip) {
+        free(config->spoof_ip);
+    }
 }
