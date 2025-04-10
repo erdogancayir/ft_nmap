@@ -19,7 +19,6 @@
 #include <stdint.h>
 #include <time.h>
 
-// TCP checksum includes pseudo-header
 struct pseudo_header {
     uint32_t src;
     uint32_t dst;
@@ -55,48 +54,51 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     int tcp_header_len = sizeof(struct tcphdr);
     int total_packet_len = sizeof(struct ip) + tcp_header_len;
 
-    // If evade mode, apply TCP options
-    // TCP options (opsiyonel) - MSS (Maximum Segment Size) = 1460
+    // Define TCP options for MSS (Maximum Segment Size)
+    // Option kind = 2 (MSS), length = 4, value = 0x05b4 (1460 bytes)
+    //0x05	MSS’in yüksek byte'ı (1460 >> 8 = 0x05)
+    //0xb4	MSS’in düşük byte'ı (1460 & 0xFF = 0xb4)
+    // MSS specifies the maximum amount of data (payload) that can be sent in a single TCP segment.
     u_char tcp_options[4] = {2, 4, 0x05, 0xb4}; // MSS = 1460
 
     if (evade_mode) {
-        // Set custom evasion flags
-        // IDS/IPS sistemlerini kandırmak için özel bayraklar kullan
+        // Enable evasion mode by setting uncommon TCP flags
+        // URG + FIN + PSH can confuse some intrusion detection systems
         flags = TH_URG | TH_FIN | TH_PUSH;
         tcp_hdr->th_flags = flags;
 
-        // Apply TCP options and update header size
-        // TCP opsiyonlarını başlığa ekle ve header uzunluğunu güncelle
+        // Append TCP options (e.g., MSS) right after the base TCP header
         memcpy((u_char *)tcp_hdr + tcp_header_len, tcp_options, sizeof(tcp_options));
-        tcp_header_len += sizeof(tcp_options);
-         // TCP header uzunluğu (32-bit kelime cinsinden)
-        tcp_hdr->th_off = tcp_header_len >> 2;  // Header length in 32-bit words
 
+        // Update TCP header length to include options
+        tcp_header_len += sizeof(tcp_options);
+
+        // Set data offset field (header length in 32-bit words)
+        tcp_hdr->th_off = tcp_header_len >> 2;
+
+        // Update total packet length for IP header calculation
         total_packet_len = sizeof(struct ip) + tcp_header_len;
     } else {
-        // Eğer evade_mode kapalıysa, varsayılan 20 byte TCP header kullan
-        tcp_hdr->th_off = sizeof(struct tcphdr) >> 2;  // No options: 20 bytes = 5 * 4
-        tcp_hdr->th_flags = flags;
+        // No evasion mode: standard TCP header (20 bytes)
+        tcp_hdr->th_off = sizeof(struct tcphdr) >> 2;  // Default TCP header length (5 * 4 = 20 bytes)
+        tcp_hdr->th_flags = flags; // Normal scan flags (e.g., SYN)
     }
 
-    // TCP başlığını doldur
-    tcp_hdr->th_sport = htons(src_port);         // Kaynak port
-    tcp_hdr->th_dport = htons(dst_port);         // Hedef port
-    tcp_hdr->th_seq = htonl(rand());             // Rastgele sequence number
-    tcp_hdr->th_ack = 0;                         // ACK kullanılmıyor
-    tcp_hdr->th_win = htons(65535);              // Pencere boyutu (maximum)
-    tcp_hdr->th_sum = 0;                         // Checksum başlangıçta 0
-    tcp_hdr->th_urp = 0;                         // URG kullanılmadığı için 0
+    tcp_hdr->th_sport = htons(src_port);
+    tcp_hdr->th_dport = htons(dst_port);
+    tcp_hdr->th_seq = htonl(rand());
+    tcp_hdr->th_ack = 0;
+    tcp_hdr->th_win = htons(65535);
+    tcp_hdr->th_sum = 0;
+    tcp_hdr->th_urp = 0;
 
-    // Pseudo header oluştur (TCP checksum için gerekli)
     struct pseudo_header psh;
-    psh.src = inet_addr(src_ip);                // Kaynak IP
-    psh.dst = inet_addr(dst_ip);                // Hedef IP
-    psh.zero = 0;                                // Sabit 0
-    psh.protocol = IPPROTO_TCP;                 // Protokol: TCP
-    psh.tcp_length = htons(sizeof(struct tcphdr)); // TCP header uzunluğu (opsiyonlar dahil edilmemiş!)
+    psh.src = inet_addr(src_ip);
+    psh.dst = inet_addr(dst_ip);
+    psh.zero = 0;
+    psh.protocol = IPPROTO_TCP;
+    psh.tcp_length = htons(sizeof(struct tcphdr));
 
-    // Build pseudo packet for checksum
     char pseudo_packet[1024];
     memcpy(pseudo_packet, &psh, sizeof(psh));
     memcpy(pseudo_packet + sizeof(psh), tcp_hdr, sizeof(struct tcphdr));
@@ -104,21 +106,19 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     tcp_hdr->th_sum = compute_checksum((unsigned short *)pseudo_packet,
                                        sizeof(psh) + sizeof(struct tcphdr));
 
-    // IP başlığını doldur
-    ip_hdr->ip_hl = 5;                           // IP header length = 5 * 4 = 20 byte
-    ip_hdr->ip_v = 4;                            // IPv4
-    ip_hdr->ip_tos = 0;                          // Tip: normal
-    ip_hdr->ip_len = htons(sizeof(struct ip) + sizeof(struct tcphdr)); // Toplam IP paket uzunluğu
-    ip_hdr->ip_id = htons(rand() % 65535);       // Rastgele ID
-    ip_hdr->ip_off = 0;                          // Fragmentation kapalı
-    ip_hdr->ip_ttl = 64;                         // Time-to-live
-    ip_hdr->ip_p = IPPROTO_TCP;                 // Taşınan protokol: TCP
-    ip_hdr->ip_sum = 0;                          // Başlangıçta 0
-    ip_hdr->ip_src.s_addr = inet_addr(src_ip);  // Kaynak IP adresi
-    ip_hdr->ip_dst.s_addr = inet_addr(dst_ip);  // Hedef IP adresi
+    ip_hdr->ip_hl = 5;
+    ip_hdr->ip_v = 4;
+    ip_hdr->ip_tos = 0;
+    ip_hdr->ip_len = htons(sizeof(struct ip) + sizeof(struct tcphdr));
+    ip_hdr->ip_id = htons(rand() % 65535);
+    ip_hdr->ip_off = 0;
+    ip_hdr->ip_ttl = 64;
+    ip_hdr->ip_p = IPPROTO_TCP;
+    ip_hdr->ip_sum = 0;
+    ip_hdr->ip_src.s_addr = inet_addr(src_ip);
+    ip_hdr->ip_dst.s_addr = inet_addr(dst_ip);
     ip_hdr->ip_sum = compute_checksum((unsigned short *)ip_hdr, sizeof(struct ip));
 
-    // Create raw socket
     int sock = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
     if (sock < 0) {
         perror("socket");
@@ -146,3 +146,139 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
 
     close(sock);
 }
+
+
+
+/*
+ * TCP Header (Layer 4 - Transport Layer)
+ * --------------------------------------
+ * This structure defines the TCP (Transmission Control Protocol) header
+ * as used in network communications, following RFC 793.
+ * 
+ * It is commonly used in raw socket programming and packet analysis.
+ * Each field corresponds to specific parts of the TCP header.
+ 
+    typedef struct s_tcp_header {
+        uint16_t src_port;      // Source port number
+        uint16_t dest_port;     // Destination port number
+        uint32_t seq_num;       // Sequence number
+        uint32_t ack_num;       // Acknowledgment number
+        uint8_t  data_offset;   // Data offset (4 bits) + Reserved (4 bits)
+        uint8_t  flags;         // TCP flags (SYN, ACK, FIN, etc.)
+        uint16_t window;        // Window size (flow control)
+        uint16_t checksum;      // TCP checksum (header + data + pseudo-header)
+        uint16_t urgent_ptr;    // Urgent pointer (only valid if URG flag set)
+    } t_tcp_header;
+ */
+
+/*
+ * TCP Header Details:
+ * -------------------
+ * 1. src_port (16 bits):
+ *    - The sender's port number.
+
+ * 2. dest_port (16 bits):
+ *    - The recipient's port number.
+
+ * 3. seq_num (32 bits):
+ *    - The sequence number of the first data byte in this segment.
+ *    - Used for reliable transmission and reordering.
+
+ * 4. ack_num (32 bits):
+ *    - The acknowledgment number; valid only if the ACK flag is set.
+ *    - Indicates the next expected byte.
+
+ * 5. data_offset (8 bits total):
+ *    - Top 4 bits: Header length in 32-bit words (min value is 5).
+ *    - Bottom 4 bits: Reserved (should be set to 0).
+
+ * 6. flags (8 bits):
+ *    - Control flags:
+ *        - FIN: 0x01
+ *        - SYN: 0x02
+ *        - RST: 0x04
+ *        - PSH: 0x08
+ *        - ACK: 0x10
+ *        - URG: 0x20
+ *        - ECE: 0x40
+ *        - CWR: 0x80
+
+ * 7. window (16 bits):
+ *    - The size of the sender's receive window.
+ *    - Used for flow control.
+
+ * 8. checksum (16 bits):
+ *    - Used to detect errors in the header and data.
+ *    - Includes pseudo-header from IP layer for reliability.
+
+ * 9. urgent_ptr (16 bits):
+ *    - Points to the last urgent byte in the segment.
+ *    - Only used if the URG flag is set.
+ */
+
+
+
+/*
+ * IPv4 Header (Layer 3 - Network Layer)
+ * -------------------------------------
+ * This structure represents the IPv4 header according to RFC 791.
+ * It contains metadata used by routers and hosts to deliver the packet.
+ * The minimum size is 20 bytes (without options).
+ *
+ * Field Descriptions:
+ *
+ * 1. uint8_t version_ihl
+ *    - Version:      The first 4 bits. Should always be 4 for IPv4.
+ *    - IHL:          The last 4 bits. Header length in 32-bit words.
+ *                    Minimum is 5 (i.e., 20 bytes), which means no options.
+ *
+ * 2. uint8_t tos
+ *    - Type of Service (now called DSCP and ECN)
+ *    - Used to prioritize or mark packets for QoS (Quality of Service).
+ *    - Often includes bits like Delay, Throughput, Reliability, etc.
+ *
+ * 3. uint16_t total_length
+ *    - Total size of the IP packet in bytes, including header and payload.
+ *    - Maximum allowed is 65535 bytes.
+ *
+ * 4. uint16_t id
+ *    - A unique identifier for the packet.
+ *    - Used during fragmentation and reassembly.
+ *
+ * 5. uint16_t frag_offset
+ *    - Fragmentation control.
+ *    - Top 3 bits are flags:
+ *        * Bit 0: Reserved (must be 0)
+ *        * Bit 1: Don't Fragment (DF)
+ *        * Bit 2: More Fragments (MF)
+ *    - Remaining 13 bits indicate the fragment offset.
+ *    - Used when a large packet is split across smaller ones.
+ *
+ * 6. uint8_t ttl
+ *    - Time To Live.
+ *    - Each router that forwards the packet decreases this value by 1.
+ *    - Prevents infinite routing loops. If TTL reaches 0, packet is dropped.
+ *
+ * 7. uint8_t protocol
+ *    - Indicates the next-layer protocol encapsulated in the payload.
+ *    - Common values:
+ *        * 1  = ICMP
+ *        * 6  = TCP
+ *        * 17 = UDP
+ *
+ * 8. uint16_t checksum
+ *    - Checksum for the IP header only (not the payload).
+ *    - Used to detect errors in header transmission.
+ *
+ * 9. uint32_t src_ip
+ *    - Source IP address (in network byte order).
+ *
+ * 10. uint32_t dest_ip
+ *     - Destination IP address (in network byte order).
+ *
+ * Notes:
+ * ------
+ * - This header is processed by routers to determine packet forwarding.
+ * - If options are present, header size will exceed 20 bytes.
+ * - Usually followed by TCP, UDP, or ICMP headers depending on the protocol field.
+ */

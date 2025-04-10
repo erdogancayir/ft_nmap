@@ -20,11 +20,6 @@
  * It extracts the relevant TCP header fields, determines the scan type used based
  * on the source port, and classifies the result (Open, Closed, Unfiltered) based
  * on the flags in the response.
- *
- * @param packet         The raw captured packet data
- * @param ip_header_len  Length of the IP header (to find TCP header offset)
- * @param results        Shared structure for storing scan results
- * @param src_ip         Source IP address from the packet (target's IP)
  */
 void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results *results, const char *src_ip) {
 	// Offset to the TCP header
@@ -54,6 +49,7 @@ void handle_tcp_packet(const u_char *packet, int ip_header_len, t_shared_results
 
 
 	// Classify result based on TCP flags
+
 	if (flags & TH_SYN && flags & TH_ACK) {
 		// SYN-ACK received → port is open (for SYN scan)
 		add_scan_result(results, src_ip, dst_scan_port, scan_type, os_guess, "Open");
