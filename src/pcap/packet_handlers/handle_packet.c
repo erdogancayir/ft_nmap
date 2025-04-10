@@ -14,17 +14,16 @@
 #include "job_queue.h"
 
 /**
- * Extracts the scan type from the given source port (our own assigned src_port).
+ * Extracts the scan job index from a given source port.
  *
- * When creating jobs, each scan type was assigned a unique source port using:
- *   src_port = PORT_SCAN_BASE + (i * scan_type_count + j)
- * 
- * This function reverses that mapping to recover the scan type index `j`:
- *   scan_type = index % scan_type_count
- * 
- * @param src_port         The source port that we sent the scan from.
- * @param scan_type_count  Total number of scan types used in this run.
- * @return                 Index of scan type (0 to scan_type_count-1), or -1 if invalid.
+ * During job creation, each scan job (combination of target IP, port, and scan type)
+ * was assigned a unique source port using the formula:
+ *     src_port = PORT_SCAN_BASE + job_index
+ *
+ * This function reverses that mapping to recover the original job index:
+ *     job_index = src_port - PORT_SCAN_BASE
+ *
+ * The job index can then be used to map back to the scan type and other job metadata.
  */
 int extract_scan_index_from_src_port(int src_port) {
     if (src_port < PORT_SCAN_BASE) return -1;
