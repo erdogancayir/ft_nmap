@@ -51,7 +51,7 @@ void print_config(t_scan_config *config) {
     }
 
     if (config->decoy_count > 0) {
-        printf("  Decoy Mode:     Enabled (%d IP)\n", config->decoy_count);
+        printf("  Decoy Mode:     " CLR_YELLOW "Enabled (%d IP)\n" CLR_RESET, config->decoy_count);
         for (int i = 0; i < config->decoy_count; i++)
             printf("      -" CLR_YELLOW " %s\n", config->decoy_ips[i]);
     } else {

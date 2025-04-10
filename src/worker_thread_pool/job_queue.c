@@ -36,10 +36,6 @@ void init_job_queue(t_job_queue *q, char *my_ip, t_scan_config config) {
 	int total_jobs = config.ip_count * config.port_count * config.scan_count;
 	q->jobs = malloc(sizeof(t_scan_job) * total_jobs);
 
-    DEBUG_PRINT("IP count: %d\n", config.ip_count);
-    DEBUG_PRINT("Port count: %d\n", config.port_count);
-    DEBUG_PRINT("Scan count: %d\n", config.scan_count);
-
     // Loop through each target IP in the list
     for (int ip_idx = 0; ip_idx < config.ip_count; ip_idx++) {
         char *target_ip = config.ip_list[ip_idx];
