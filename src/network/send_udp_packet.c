@@ -32,7 +32,7 @@ unsigned short checksum(unsigned short *ptr, int nbytes) {
 
 void send_udp_packet(const char *src_ip, const char *dst_ip, int src_port, int dst_port) {
     char packet[4096] = {0};
-    const char *payload = "PING"; // 4 byte örnek veri
+    const char *payload = "PING";
     int payload_size = 4;
 
     struct ip *ip_hdr = (struct ip *)packet;
@@ -40,7 +40,6 @@ void send_udp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     char *data = (char *)(packet + sizeof(struct ip) + sizeof(struct udphdr));
     memcpy(data, payload, payload_size);
 
-    // IP header
     ip_hdr->ip_hl = 5;
     ip_hdr->ip_v = 4;
     ip_hdr->ip_tos = 0;
@@ -53,13 +52,11 @@ void send_udp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     ip_hdr->ip_dst.s_addr = inet_addr(dst_ip);
     ip_hdr->ip_sum = checksum((unsigned short *)ip_hdr, sizeof(struct ip));
 
-    // UDP header
     udp_hdr->uh_sport = htons(src_port);
     udp_hdr->uh_dport = htons(dst_port);
     udp_hdr->uh_ulen = htons(sizeof(struct udphdr) + payload_size);
-    udp_hdr->uh_sum = 0; // opsiyonel, çoğu sistemde 0 kabul edilir
+    udp_hdr->uh_sum = 0;
 
-    // Soket oluştur
     int sock = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
     if (sock < 0) {
         perror("socket");
