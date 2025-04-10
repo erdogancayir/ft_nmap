@@ -91,7 +91,7 @@ int parse_scan_types(const char *input, scan_type *scans, t_scan_config *config)
     while (token && count < MAX_SCAN_TYPES) {
 		for (int i = 0; i < count; i++)
 		{
-			if (strcmp(token, scans[i]) == 0)
+			if (strcmp(token, scan_type_to_str(scans[i])) == 0)
 			{
 				token = strtok(NULL, ",");
 				continue;
