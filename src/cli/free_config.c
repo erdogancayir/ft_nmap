@@ -19,4 +19,13 @@ void free_config(t_scan_config *config) {
     if (config->spoof_ip) {
         free(config->spoof_ip);
     }
+
+    for (int idx = 0; idx < config->decoy_count; idx++)
+    {
+        free(config->decoy_ips[idx]);
+    }
+
+    if (config->decoy_ips) {
+        free(config->decoy_ips);
+    }
 }

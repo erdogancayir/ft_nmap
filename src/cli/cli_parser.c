@@ -239,9 +239,18 @@ void parse_args(int argc, char **argv, t_scan_config *config) {
         else if (strcmp(argv[i], "--decoy") == 0 && i + 1 < argc) {
             char *token;
             int count = 0;
-            config->decoy_ips = malloc(sizeof(char *) * 10);  // max 10 decoy (genişletilebilir)
+            config->decoy_ips = malloc(sizeof(char *) * 3);  // max 10 decoy (genişletilebilir)
             token = strtok(argv[++i], ",");
-            while (token && count < 10) {
+            while (token) {
+                if (count >= 3)
+                {
+                    printf("Cant not decoy more than 3 ip adreess!\n");
+                    clean_exit(config, "❌ Error");
+                }
+                if (!is_valid_ip(token)) {
+                    printf("Invalid decoy IP address: %s\n", token);
+                    clean_exit(config, "❌ Error");
+                }
                 config->decoy_ips[count++] = strdup(token);
                 token = strtok(NULL, ",");
             }
