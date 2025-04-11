@@ -207,7 +207,6 @@ sudo yum install libpcap-devel
 </details>
 
 ## Usage
-<summary>Click to expand</summary>
 
 ### Basic Syntax
 
