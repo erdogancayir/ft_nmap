@@ -785,6 +785,60 @@ void create_tcp_packet(char *buffer, size_t payload_size) {
 
 This section provides a comprehensive understanding of packet size management in TCP/IP networking, from MSS negotiation to IP fragmentation handling. Understanding these concepts is crucial for implementing efficient and reliable network applications.
 
+## 📊 TCP Window Size and Flow Control
+
+### Understanding TCP Window Size
+
+The TCP window size (`th_win` in the TCP header) is a crucial mechanism for flow control in TCP communications. It represents the amount of data (in bytes) that the receiver is willing to accept before requiring an acknowledgment.
+
+```c
+struct tcphdr {
+    uint16_t th_sport;    // source port
+    uint16_t th_dport;    // destination port
+    uint32_t th_seq;      // sequence number
+    uint32_t th_ack;      // acknowledgment number
+    uint8_t  th_off;      // data offset (header length in 32-bit words)
+    uint8_t  th_flags;    // TCP flags
+    uint16_t th_win;      // window size (in bytes)
+    uint16_t th_sum;      // checksum
+    uint16_t th_urp;      // urgent pointer
+};
+```
+
+### Interaction with MSS and Congestion Control
+
+1. **Window Size vs MSS**
+   ```
+   Window Size = 65535 bytes
+   MSS = 1460 bytes
+   Number of segments = Window Size / MSS = 44 segments
+   ```
+### Common Scenarios
+
+1. **Zero Window**
+   ```
+   Sender: Sends data
+   Receiver: Advertises window=0 (buffer full)
+   Sender: Stops sending
+   Receiver: Processes data, advertises new window
+   Sender: Resumes sending
+   ```
+
+2. **Window Size Changes**
+   ```
+   Initial: Window=65535
+   After congestion: Window=32768
+   After recovery: Window grows gradually
+   ```
+
+3. **Window Scaling**
+   ```
+   Without scaling: Max window=65535
+   With scaling (factor=14): Max window=1GB
+   ```
+
+This section provides a comprehensive understanding of TCP window size and flow control mechanisms. Understanding these concepts is crucial for implementing efficient and reliable TCP-based network applications.
+
 
 
 
