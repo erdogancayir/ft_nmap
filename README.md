@@ -135,24 +135,6 @@ For a deeper understanding of packet capture and network analysis:
 
 The Job Queue is a central component that manages the distribution of scanning tasks across multiple threads. It implements a producer-consumer pattern to ensure efficient and thread-safe task distribution.
 
-#### How It Works
-
-1. **Job Creation**
-   - Main thread creates jobs based on:
-     - Port ranges (e.g., 70-90)
-     - Scan types (e.g., SYN, UDP)
-     - Target IP addresses
-
-2. **Job Structure**
-```c
-typedef struct s_job {
-    uint16_t port;           // Port to scan
-    uint8_t scan_type;       // Type of scan (SYN, NULL, etc.)
-    char *target_ip;         // Target IP address
-    struct s_job *next;      // Next job in queue
-} t_job;
-```
-
 #### Visual Representation
 
 ```mermaid
@@ -554,56 +536,6 @@ graph TD
     end
 ```
 
-### Architecture Components
-
-1. **User Interface Layer**
-   - Command Line Interface (CLI)
-   - Argument Parser
-   - Configuration Management
-
-2. **Core Components**
-   - Scan Configuration
-   - Job Queue System
-   - Thread Pool Manager
-
-3. **Scanning Engine**
-   - Port Scanner
-   - Packet Crafter
-   - Packet Sniffer
-
-4. **Network Layer**
-   - Raw Socket Interface
-   - PCAP Interface
-   - Network Communication
-
-5. **Results Processing**
-   - Result Aggregator
-   - Result Printer
-   - Status Reporting
-
-### Data Flow
-
-1. **Command Processing**
-   ```
-   User Input → CLI → Argument Parser → Configuration
-   ```
-
-2. **Scan Execution**
-   ```
-   Configuration → Job Queue → Thread Pool → Scanner
-   ```
-
-3. **Network Operations**
-   ```
-   Scanner → Packet Crafter → Raw Socket → Network
-   Network → PCAP → Sniffer → Results
-   ```
-
-4. **Result Handling**
-   ```
-   Scanner + Sniffer → Result Aggregator → Result Printer
-   ```
-
 ### Thread Management
 
 1. **Main Thread**
@@ -620,23 +552,6 @@ graph TD
    - Captures network packets
    - Processes responses
    - Updates results
-
-### Resource Management
-
-1. **Memory Management**
-   - Dynamic allocation for jobs
-   - Buffer management for packets
-   - Result storage optimization
-
-2. **Thread Resources**
-   - Thread pool sizing
-   - Thread synchronization
-   - Resource cleanup
-
-3. **Network Resources**
-   - Socket management
-   - PCAP handle management
-   - Buffer allocation
 
 ```bash
 make debug
