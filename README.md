@@ -4,7 +4,6 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
 
 ## 📋 Table of Contents
 - [Features](#features)
-- [Installation](#installation)
 - [Usage](#usage)
 - [Architecture](#architecture)
 
@@ -204,27 +203,6 @@ sudo apt-get install libpcap-dev
 **CentOS/RHEL:**
 ```bash
 sudo yum install libpcap-devel
-```
-</details>
-
-## 🚀 Installation
-<details>
-<summary>Click to expand</summary>
-
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/ft_nmap.git
-cd ft_nmap
-```
-
-2. Build the project:
-```bash
-make
-```
-
-3. Run with appropriate permissions:
-```bash
-sudo ./ft_nmap [OPTIONS]
 ```
 </details>
 
