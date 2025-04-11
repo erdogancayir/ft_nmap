@@ -844,60 +844,213 @@ void create_tcp_packet(char *buffer, size_t payload_size) {
 
 This section provides a comprehensive understanding of packet size management in TCP/IP networking, from MSS negotiation to IP fragmentation handling. Understanding these concepts is crucial for implementing efficient and reliable network applications.
 
+# 🧠 TCP/IP Fundamentals: MSS, MTU, Fragmentation, Payload, and Window Control
+
+This README provides a detailed explanation of TCP/IP data transmission mechanics with focus on:
+
+- MSS (Maximum Segment Size)
+- MTU (Maximum Transmission Unit)
+- IP Fragmentation
+- TCP Payload Length calculation
+- TCP Window Size
+- TCP Window Scaling
+
+It is especially useful for developers working with **raw sockets** or implementing low-level networking tools.
+
+---
+
+## 📦 MSS (Maximum Segment Size)
+
+**MSS** is the maximum amount of **TCP payload (data)** that can be sent in a single TCP segment, **excluding headers**.
+
+### ✅ How is MSS determined?
+MSS is typically calculated as:
+
+```
+MSS = MTU - IP header size - TCP header size
+```
+On standard Ethernet:
+```
+MTU = 1500 bytes IP header = 20 bytes TCP header = 20 bytes → MSS = 1460 bytes
+```
+
+
+### 🔄 MSS Negotiation
+- During the **TCP 3-way handshake**, each side advertises its MSS in the SYN packet via **TCP Options**.
+- If not specified, the receiver assumes a default of **536 bytes** (per RFC 1122).
+
+---
+
+## 📏 MTU (Maximum Transmission Unit)
+
+**MTU** is the **maximum size of an IP packet** that can be transmitted over a network link **including headers**.
+
+- Ethernet MTU = **1500 bytes**
+- If a packet exceeds the MTU, **IP fragmentation** may occur unless **DF (Don't Fragment)** is set.
+
+---
+
+## 💥 IP Fragmentation
+
+When an IP packet exceeds the MTU:
+
+- It is split into smaller **fragments** at the IP layer.
+- Each fragment gets its own IP header.
+- The receiver reassembles fragments using fields in the IP header.
+
+### 🔍 Key Fields in IP Header
+
+```c
+struct ip {
+    uint8_t  ip_hl:4;     // Header Length (×4 = bytes)
+    uint8_t  ip_v:4;      // IP version
+    uint16_t ip_len;      // Total length (header + payload)
+    uint16_t ip_off;      // Fragment offset and flags (DF, MF)
+};
+
+```
+ip_len: total length of the IP packet
+ip_off: contains fragmentation info:
+DF (Don't Fragment): if set, fragmentation is not allowed
+MF (More Fragments): set if more fragments follow
+Fragment Offset: location of the current fragment (in 8-byte blocks)
+```
+
+## 📐 Calculating TCP Payload Length
+
+When working with **raw packets**, you may need to manually calculate the **TCP payload length** — i.e., the actual data carried inside the TCP segment excluding all headers.
+
+### ✅ Required Fields
+
+To calculate it, you need values from both the IP and TCP headers:
+
+```c
+int ip_header_len = ip_hdr->ip_hl * 4;            // IP header length in bytes
+int ip_total_len  = ntohs(ip_hdr->ip_len);        // Total IP packet length in bytes
+
+int tcp_header_len = tcp_hdr->th_off * 4;         // TCP header length in bytes
+
+int tcp_payload_len = ip_total_len - ip_header_len - tcp_header_len;
+```
+
+ip_hdr->ip_hl: IP header length (in 32-bit words), multiply by 4 to convert to bytes
+ip_hdr->ip_len: Total length of the IP packet (including IP + TCP + data); must convert from network byte order using ntohs()
+tcp_hdr->th_off: TCP header length (also in 32-bit words), multiply by 4
+The result: tcp_payload_len gives you the number of data bytes carried in that segment
+
 ## 📊 TCP Window Size and Flow Control
 
-### Understanding TCP Window Size
+### 🔍 What is TCP Window Size?
 
-The TCP window size (`th_win` in the TCP header) is a crucial mechanism for flow control in TCP communications. It represents the amount of data (in bytes) that the receiver is willing to accept before requiring an acknowledgment.
+The **TCP window size** (`th_win`) is a 16-bit field in the TCP header that tells the sender how many bytes it can send before requiring an acknowledgment. It plays a key role in **flow control**, ensuring the receiver is not overwhelmed by too much data at once.
 
 ```c
 struct tcphdr {
-    uint16_t th_sport;    // source port
-    uint16_t th_dport;    // destination port
-    uint32_t th_seq;      // sequence number
-    uint32_t th_ack;      // acknowledgment number
-    uint8_t  th_off;      // data offset (header length in 32-bit words)
+    uint16_t th_sport;    // Source port
+    uint16_t th_dport;    // Destination port
+    uint32_t th_seq;      // Sequence number
+    uint32_t th_ack;      // Acknowledgment number
+    uint8_t  th_off;      // Header length (in 32-bit words)
     uint8_t  th_flags;    // TCP flags
-    uint16_t th_win;      // window size (in bytes)
-    uint16_t th_sum;      // checksum
-    uint16_t th_urp;      // urgent pointer
+    uint16_t th_win;      // Window size (in bytes)
+    uint16_t th_sum;      // Checksum
+    uint16_t th_urp;      // Urgent pointer
 };
 ```
 
-### Interaction with MSS and Congestion Control
+### 📐 MSS and Window Size Relationship
+The maximum number of unacknowledged segments a sender can send is directly influenced by the window size and the MSS (Maximum Segment Size).
 
-1. **Window Size vs MSS**
-   ```
-   Window Size = 65535 bytes
-   MSS = 1460 bytes
-   Number of segments = Window Size / MSS = 44 segments
-   ```
-### Common Scenarios
-
-1. **Zero Window**
-   ```
-   Sender: Sends data
-   Receiver: Advertises window=0 (buffer full)
-   Sender: Stops sending
-   Receiver: Processes data, advertises new window
-   Sender: Resumes sending
-   ```
-
-2. **Window Size Changes**
-   ```
-   Initial: Window=65535
-   After congestion: Window=32768
-   After recovery: Window grows gradually
-   ```
-
-3. **Window Scaling**
-   ```
-   Without scaling: Max window=65535
-   With scaling (factor=14): Max window=1GB
-   ```
-
-This section provides a comprehensive understanding of TCP window size and flow control mechanisms. Understanding these concepts is crucial for implementing efficient and reliable TCP-based network applications.
+```
+Window Size = 65535 bytes
+MSS = 1460 bytes
+→ Max in-flight segments = 65535 / 1460 ≈ 44 segments
+```
 
 
+### 📘 Common Flow Control Scenarios
+1. 🛑 Zero Window (Receiver's buffer is full)
 
+```
+Sender: Sends data
+Receiver: Advertises window = 0
+Sender: Pauses sending
+Receiver: Frees up buffer space, advertises a new window
+Sender: Resumes sending
+```
+
+2. 📉 Dynamic Window Adjustments Due to Congestion
+
+```
+Initial: Window = 65535
+Network congestion occurs → Window reduced to avoid further loss
+Recovery → Window increases gradually (via slow start or congestion avoidance)
+```
+
+## 🔁 TCP Window Scaling (RFC 1323)
+
+The TCP window size (`th_win`) field is only 16 bits, which limits it to a maximum of **65535 bytes**. In modern high-speed or high-latency networks (such as gigabit Ethernet or satellite links), this limit is often insufficient.  
+**TCP Window Scaling**, introduced in **RFC 1323**, extends the window size beyond 64KB by applying a scaling factor.
+
+---
+
+### 🔬 How Window Scaling Works
+
+The **effective window size** is calculated by multiplying the `th_win` field with a **scaling factor**, which is a power of 2:
+
+```
+Effective Window = th_win × 2^scale_factor
+```
+
+
+This allows TCP to advertise a window size up to **1 GB**.
+
+---
+
+### 📦 TCP Option Format
+
+The scaling factor is sent during the **TCP 3-way handshake** in the SYN and SYN-ACK packets as part of TCP Options.
+
+| Field        | Value                    |
+|--------------|--------------------------|
+| Kind         | `3` (Window Scale Option) |
+| Length       | `3`                        |
+| Shift Count  | 0–14 (scaling exponent)   |
+
+- **Kind = 3**: Identifies this option as Window Scale.
+- **Length = 3**: Total length of this option in bytes.
+- **Shift Count**: The exponent for 2^n scaling.
+
+Example TCP option as seen in Wireshark:
+
+```
+Window Scale: 7 (multiply by 128) Kind: 3 Length: 3 Shift Count: 7
+```
+
+### 💡 Example Calculation
+
+```
+th_win = 65535 Scale Factor = 7 → 2^7 = 128 Effective Window = 65535 × 128 = 8,388,480 bytes ≈ 8 MB
+```
+
+
+---
+
+### ⚠️ Important Notes
+
+- This option is only exchanged during the **initial handshake (SYN phase)**.
+- **Both peers** must include the window scale option for scaling to take effect.
+- If one side does not support it, the window remains limited to **65535 bytes**.
+
+---
+
+### ✅ Summary
+
+| Concept             | Description |
+|---------------------|-------------|
+| **Window Scaling**  | Enables TCP window size beyond 64KB |
+| **Sent in**         | SYN and SYN-ACK packets (during handshake) |
+| **Required by**     | Both client and server |
+| **Max Window Size** | Up to ~1 GB (with 2^14 scaling factor) |
+| **Default Max**     | 65535 bytes without scaling |
 
