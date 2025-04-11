@@ -207,7 +207,6 @@ sudo yum install libpcap-devel
 </details>
 
 ## Usage
-<details>
 <summary>Click to expand</summary>
 
 ### Basic Syntax
@@ -252,7 +251,6 @@ sudo ./ft_nmap --ip 192.168.1.1 --speedup 100 --port 80,443,8080 --scan SYN,UDP
 ```bash
 sudo ./ft_nmap --file targets.txt --speedup 150 --port 20-25,80,443,3306 --scan SYN,ACK
 ```
-</details>
 
 ## 🏗️ System Architecture
 
