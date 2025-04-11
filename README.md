@@ -587,6 +587,204 @@ make debug
 
 <img width="590" alt="Screenshot 2025-04-08 at 17 17 46" src="https://github.com/user-attachments/assets/b27289c6-ffe6-4bf8-b8a2-daec96d4c67e" />
 
+## 📦 TCP/IP Packet Size Management: MSS, MTU, and Fragmentation
+
+### Understanding Packet Size Concepts
+
+#### Maximum Segment Size (MSS)
+
+MSS is the largest amount of data that can be carried in a single TCP segment. It's negotiated during the TCP three-way handshake and represents the maximum payload size that can be sent in one TCP segment.
+
+```c
+// TCP header structure showing MSS option
+struct tcphdr {
+    uint16_t th_sport;    // source port
+    uint16_t th_dport;    // destination port
+    uint32_t th_seq;      // sequence number
+    uint32_t th_ack;      // acknowledgment number
+    uint8_t  th_off;      // data offset (header length in 32-bit words)
+    uint8_t  th_flags;    // TCP flags
+    uint16_t th_win;      // window size
+    uint16_t th_sum;      // checksum
+    uint16_t th_urp;      // urgent pointer
+    // Options (including MSS) follow
+};
+```
+
+#### Maximum Transmission Unit (MTU)
+
+MTU is the largest size of an IP packet that can be transmitted without fragmentation over a network link. It includes both IP header and payload.
+
+```c
+// IP header structure showing length fields
+struct ip {
+    uint8_t  ip_vhl;      // version << 4 | header length >> 2
+    uint8_t  ip_tos;      // type of service
+    uint16_t ip_len;      // total length
+    uint16_t ip_id;       // identification
+    uint16_t ip_off;      // fragment offset field
+    uint8_t  ip_ttl;      // time to live
+    uint8_t  ip_p;        // protocol
+    uint16_t ip_sum;      // checksum
+    struct   in_addr ip_src;
+    struct   in_addr ip_dst;
+};
+```
+
+### Packet Size Calculation
+
+#### Calculating TCP Payload Length
+
+```c
+// Calculate TCP payload length from raw packet
+size_t calculate_tcp_payload_length(const u_char *packet) {
+    struct ip *ip_header = (struct ip *)packet;
+    struct tcphdr *tcp_header = (struct tcphdr *)(packet + (ip_header->ip_vhl & 0x0F) * 4);
+    
+    // Total IP length - IP header length - TCP header length
+    size_t payload_length = ntohs(ip_header->ip_len) - 
+                          ((ip_header->ip_vhl & 0x0F) * 4) - 
+                          (tcp_header->th_off * 4);
+    
+    return payload_length;
+}
+```
+
+### IP Fragmentation
+
+#### When Fragmentation Occurs
+
+Fragmentation happens when an IP packet is larger than the MTU of the network link it needs to traverse. The packet is divided into smaller fragments, each containing a portion of the original data.
+
+#### Fragmentation Fields
+
+1. **Identification (ip_id)**
+   - Unique identifier for all fragments of a packet
+   - Used to reassemble fragments at the destination
+
+2. **Fragment Offset (ip_off)**
+   - Indicates where the fragment belongs in the original packet
+   - Measured in 8-byte blocks
+   ```c
+   #define IP_OFFMASK 0x1fff  // fragment offset mask
+   #define IP_DF 0x4000       // don't fragment flag
+   #define IP_MF 0x2000       // more fragments flag
+   ```
+
+3. **Flags**
+   - DF (Don't Fragment): If set, packet must not be fragmented
+   - MF (More Fragments): If set, more fragments follow
+
+### Practical Example: Raw Socket Packet Creation
+
+```c
+void create_tcp_packet(char *buffer, size_t payload_size) {
+    struct ip *ip_header = (struct ip *)buffer;
+    struct tcphdr *tcp_header = (struct tcphdr *)(buffer + sizeof(struct ip));
+    char *payload = buffer + sizeof(struct ip) + sizeof(struct tcphdr);
+    
+    // IP header setup
+    ip_header->ip_vhl = 4 << 4 | 5;  // IPv4, 5 32-bit words
+    ip_header->ip_len = htons(sizeof(struct ip) + sizeof(struct tcphdr) + payload_size);
+    ip_header->ip_off = htons(IP_DF);  // Don't fragment
+    
+    // TCP header setup
+    tcp_header->th_off = 5;  // 5 32-bit words
+    // ... other TCP header fields ...
+    
+    // Calculate total packet size
+    size_t total_size = sizeof(struct ip) + sizeof(struct tcphdr) + payload_size;
+    
+    // Check if packet exceeds MTU
+    if (total_size > MTU) {
+        // Handle MTU exceedance (either fragment or error)
+        if (ip_header->ip_off & IP_DF) {
+            // Can't fragment, must handle error
+            handle_mtu_exceedance();
+        } else {
+            // Fragment packet
+            fragment_packet(buffer, total_size);
+        }
+    }
+}
+```
+
+### Responsibility for Segmentation and Fragmentation
+
+1. **TCP Segmentation**
+   - TCP layer handles segmentation based on MSS
+   - Ensures segments fit within MSS
+   - Handles retransmission and flow control
+
+2. **IP Fragmentation**
+   - IP layer handles fragmentation based on MTU
+   - Can occur at any router along the path
+   - Reassembly happens only at the final destination
+
+### Best Practices
+
+1. **Avoiding Fragmentation**
+   ```c
+   // Set DF flag to prevent fragmentation
+   ip_header->ip_off = htons(IP_DF);
+   
+   // Use path MTU discovery
+   size_t path_mtu = discover_path_mtu(destination);
+   ```
+
+2. **Handling Fragmented Packets**
+   ```c
+   typedef struct s_fragment {
+       uint16_t id;
+       uint16_t offset;
+       uint8_t more_fragments;
+       char *data;
+       size_t length;
+   } t_fragment;
+   
+   void reassemble_fragments(t_fragment *fragments, int count) {
+       // Sort by offset
+       qsort(fragments, count, sizeof(t_fragment), compare_offsets);
+       
+       // Reconstruct original packet
+       char *reassembled = malloc(total_length);
+       for (int i = 0; i < count; i++) {
+           memcpy(reassembled + fragments[i].offset, 
+                  fragments[i].data, 
+                  fragments[i].length);
+       }
+   }
+   ```
+
+### Common Scenarios
+
+1. **MSS Negotiation**
+   ```
+   Client: SYN (MSS=1460)
+   Server: SYN-ACK (MSS=1460)
+   Client: ACK
+   ```
+
+2. **MTU Path Discovery**
+   ```
+   Sender: Packet with DF=1, size=1500
+   Router: ICMP "Fragmentation Needed"
+   Sender: Adjusts packet size
+   ```
+
+3. **Fragmentation Example**
+   ```
+   Original Packet (2000 bytes)
+   ├── Fragment 1 (1500 bytes)
+   │   ├── IP Header (MF=1, Offset=0)
+   │   └── Data (1480 bytes)
+   └── Fragment 2 (520 bytes)
+       ├── IP Header (MF=0, Offset=185)
+       └── Data (500 bytes)
+   ```
+
+This section provides a comprehensive understanding of packet size management in TCP/IP networking, from MSS negotiation to IP fragmentation handling. Understanding these concepts is crucial for implementing efficient and reliable network applications.
+
 
 
 

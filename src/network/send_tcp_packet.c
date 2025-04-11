@@ -54,7 +54,7 @@ void send_tcp_packet(const char *src_ip, const char *dst_ip, int src_port, int d
     int tcp_header_len = sizeof(struct tcphdr);
     int total_packet_len = sizeof(struct ip) + tcp_header_len;
 
-    // Define TCP options for MSS (Maximum Segment Size)
+    // Define TCP options for MSS (Maximum Segment Size) MTU Maximum Transmission Unit (all)
     // Option kind = 2 (MSS), length = 4, value = 0x05b4 (1460 bytes)
     //0x05	MSS’in yüksek byte'ı (1460 >> 8 = 0x05)
     //0xb4	MSS’in düşük byte'ı (1460 & 0xFF = 0xb4)
