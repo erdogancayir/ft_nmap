@@ -13,6 +13,8 @@ A lightweight network port scanner implementation in C, inspired by nmap. This p
 For a deeper understanding of packet capture and network analysis:
 - [Understanding PCAP: The Magic Key to Network Packet Capture](https://medium.com/@erdogancayir/pcap-nedir-a%C4%9F-paketlerini-yakalaman%C4%B1n-sihirli-anahtar%C4%B1-7ce4239340f6) - A comprehensive guide to PCAP (Turkish)
 
+- [Understanding Raw Sockets](https://medium.com/@erdogancayir/raw-socketler-kullan%C4%B1m%C4%B1-raw-sockets-89f65d8ce063) - A comprehensive guide to RAW Sockets (Turkish)
+
 ## Features
 
 - **Multiple Scan Types**
