@@ -211,6 +211,11 @@ sudo yum install libpcap-devel
 <summary>Click to expand</summary>
 
 ### Basic Syntax
+
+```bash
+make debug or make
+```
+
 ```bash
 ./ft_nmap [OPTIONS]
 ```
@@ -331,10 +336,6 @@ graph TD
    - Captures network packets
    - Processes responses
    - Updates results
-
-```bash
-make debug
-```
 
 <img width="811" alt="Screenshot 2025-04-08 at 17 17 30" src="https://github.com/user-attachments/assets/66233e42-9fb1-4f43-9d12-493fcdf3b591" />
 
