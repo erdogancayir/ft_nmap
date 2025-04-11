@@ -38,6 +38,63 @@ For a deeper understanding of packet capture and network analysis:
   - Progress indication
   - Service name mapping
 
+- **Advanced Scanning Modes**
+  - **Evade Mode**
+    - Random packet timing
+    - Fragmented packets
+    - IP ID randomization
+    - TCP sequence number randomization
+    - Custom TTL values
+    - Protocol-specific evasion techniques
+
+  - **Stealth Mode**
+    - Slow scan rate
+    - Random source ports
+    - No ping probes
+    - No DNS resolution
+    - Minimal packet footprint
+    - Covert timing patterns
+
+  - **OS Detection Mode**
+    - TCP/IP fingerprinting
+    - TCP options analysis
+    - IP ID sequence analysis
+    - Window size analysis
+    - TTL analysis
+    - ICMP response analysis
+
+  - **Host Resolution Mode**
+    - DNS resolution
+    - Reverse DNS lookup
+    - Multiple DNS servers
+    - DNS cache checking
+    - Custom DNS timeout
+    - DNS record types (A, AAAA, PTR)
+
+  - **Version Detection Mode**
+    - Service banner grabbing
+    - Protocol-specific probes
+    - SSL/TLS version detection
+    - Application version fingerprinting
+    - Custom version detection scripts
+    - Version database matching
+
+  - **IP Spoofing Mode**
+    - Custom source IP
+    - Random source IP
+    - MAC address spoofing
+    - IP ID spoofing
+    - TCP sequence spoofing
+    - Custom TTL spoofing
+
+  - **Decoy IPs Mode**
+    - Multiple decoy IPs
+    - Random decoy selection
+    - Decoy timing patterns
+    - Decoy packet types
+    - Custom decoy ratios
+    - Decoy verification
+
 ### Scan Types
 
 ### TCP Scans
