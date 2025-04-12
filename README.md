@@ -142,7 +142,7 @@ graph TD
     B -->|Distributes| C[Worker Thread 1]
     B -->|Distributes| D[Worker Thread 2]
     B -->|Distributes| E[Worker Thread N]
-    G[Sniffer Thread] -->|Packet Data| F
+    G[Sniffer Thread] -->|Packet Data| F[Shared Results]
 ```
 
 #### Example Job Matrix
