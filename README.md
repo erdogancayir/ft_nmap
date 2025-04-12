@@ -143,8 +143,6 @@ graph TD
     B -->|Distributes| D[Worker Thread 2]
     B -->|Distributes| E[Worker Thread N]
     C -->|Results| F[Shared Results]
-    D -->|Results| F
-    E -->|Results| F
     G[Sniffer Thread] -->|Packet Data| F
 ```
 
