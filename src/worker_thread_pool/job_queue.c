@@ -7,7 +7,7 @@
  * 
  * Each job corresponds to one scan type and one port (e.g., SYN scan on port 80).
  * A unique source port is generated for each job using the formula:
- *      src_port = PORT_SCAN_BASE + (i * scan_count + j)
+ *      src_port = PORT_SCAN_BASE * j)
  * 
  * @param q        Pointer to the job queue structure
  * @param my_ip    Local IP address to be used as source
