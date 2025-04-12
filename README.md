@@ -138,11 +138,12 @@ The Job Queue is a central component that manages the distribution of scanning t
 
 ```mermaid
 graph TD
-    A[Main Thread] -->|Creates Jobs| B[Job Queue] -->|G[Sniffer Thread]
+    A[Main Thread] -->|Creates Jobs| B[Job Queue]
     B -->|Distributes| C[Worker Thread 1]
     B -->|Distributes| D[Worker Thread 2]
     B -->|Distributes| E[Worker Thread N]
     G[Sniffer Thread] -->|Packet Data| F[Shared Results]
+    A --> G
 ```
 
 #### Example Job Matrix
